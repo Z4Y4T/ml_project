@@ -1,0 +1,44 @@
+\babel@toc {russian}{}\relax 
+\contentsline {section}{Введение}{2}{Doc-Start}%
+\contentsline {section}{\numberline {1}Постановка задачи машинного обучения}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Объекты, признаки и ответы}{3}{subsection.1.1}%
+\contentsline {paragraph}{Регрессия.}{3}{subsection.1.1}%
+\contentsline {paragraph}{Классификация.}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Модель как семейство функций}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Функция потерь}{4}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Обучающая и тестовая выборки}{4}{subsection.1.4}%
+\contentsline {section}{\numberline {2}Линейные модели}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Линейная регрессия}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Среднеквадратичная ошибка}{5}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Градиент MSE и аналитическое решение}{6}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Логистическая регрессия}{7}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Максимальное правдоподобие и cross-entropy}{8}{subsection.2.5}%
+\contentsline {section}{\numberline {3}Градиентные методы оптимизации}{8}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Градиентный спуск}{8}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Влияние размера шага}{9}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Momentum}{10}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Nesterov Momentum}{10}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}AdaGrad}{10}{subsection.3.5}%
+\contentsline {subsection}{\numberline {3.6}RMSProp}{11}{subsection.3.6}%
+\contentsline {subsection}{\numberline {3.7}Adam}{11}{subsection.3.7}%
+\contentsline {subsection}{\numberline {3.8}Сравнение методов}{12}{subsection.3.8}%
+\contentsline {section}{\numberline {4}Решающие деревья и градиентный бустинг}{12}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Решающие деревья}{12}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Почему обычный Gradient Descent здесь неприменим}{13}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Идея ансамбля}{13}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Gradient Boosting}{13}{subsection.4.4}%
+\contentsline {section}{\numberline {5}Практическая часть}{14}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Используемые средства}{14}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Эксперимент 1: поверхность loss линейной регрессии}{14}{subsection.5.2}%
+\contentsline {paragraph}{Результат эксперимента.}{15}{figure.caption.7}%
+\contentsline {subsection}{\numberline {5.3}Эксперимент 2: влияние learning rate}{15}{subsection.5.3}%
+\contentsline {paragraph}{Результат эксперимента.}{16}{figure.caption.8}%
+\contentsline {subsection}{\numberline {5.4}Эксперимент 3: сравнение оптимизаторов}{16}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Эксперимент 4: построение небольшого дерева}{16}{subsection.5.5}%
+\contentsline {paragraph}{Результат эксперимента.}{17}{figure.caption.11}%
+\contentsline {subsection}{\numberline {5.6}Эксперимент 5: пошаговый Gradient Boosting}{17}{subsection.5.6}%
+\contentsline {paragraph}{Результат эксперимента.}{18}{figure.caption.12}%
+\contentsline {section}{\numberline {6}Распределение работы между участниками}{18}{section.6}%
+\contentsline {section}{Заключение}{18}{section.6}%
+\contentsline {section}{Список источников}{19}{section.6}%
+\contentsline {section}{\numberline {A}Программная реализация}{19}{appendix.A}%
