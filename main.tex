@@ -4,6 +4,7 @@
 \usecolortheme{default}
 
 \usepackage[utf8]{inputenc}
+\renewcommand{\bfdefault}{bx}
 \usepackage[T2A]{fontenc}
 \usepackage[russian]{babel}
 \usepackage{amsmath,amssymb,mathtools}
@@ -14,25 +15,9 @@
 \usepackage{array}
 \usepackage{hyperref}
 
-% ------------------------------------------------------------
-% Безопасная вставка будущих визуальных материалов.
-% Если файл пока отсутствует, LaTeX просто пропускает его без ошибки.
-% Как только файл появляется по указанному пути, он вставляется автоматически.
-% ------------------------------------------------------------
-
-\newcommand{\safeimg}[2][]{%
-    \IfFileExists{#2}{\includegraphics[#1]{#2}}{}%
-}
-
-\newcommand{\safeanimation}[3][]{%
-    \IfFileExists{#2}{%
-        \IfFileExists{#3}{%
-            \href{run:#3}{\includegraphics[#1]{#2}}%
-        }{%
-            \includegraphics[#1]{#2}%
-        }%
-    }{}%
-}
+% Рисунки входят в комплект проекта; отсутствующий файл — ошибка,
+% а не повод молча оставить пустое место на слайде.
+\newcommand{\slideimg}[2][]{\includegraphics[#1]{#2}}
 
 
 % ------------------------------------------------------------
@@ -41,6 +26,7 @@
 
 \definecolor{defblue}{RGB}{0,0,150}
 \definecolor{cardblue}{RGB}{216,216,240}
+\setbeamercolor{button}{bg=defblue,fg=white}
 
 \newcommand{\blue}[1]{\textcolor{blue}{#1}}
 \newcommand{\dblue}[1]{\textcolor{defblue}{#1}}
@@ -69,7 +55,7 @@
         \node[
             blue,
             anchor=north,
-            font=\fontsize{4.8}{5.2}\selectfont\bfseries,
+            font=\fontsize{5.25}{5.7}\selectfont\bfseries,
             align=center,
             text width=1.48cm
         ]
@@ -81,7 +67,7 @@
         \node[
             black,
             anchor=north,
-            font=\fontsize{4.8}{5.4}\selectfont,
+            font=\fontsize{5.15}{5.8}\selectfont,
             align=center,
             text width=1.48cm
         ]
@@ -109,11 +95,16 @@
     \end{frame}
 }
 
-\newcommand{\mlDefinition}{\dblue{Определение}}
-\newcommand{\mlStatement}{\dblue{Утверждение}}
-\newcommand{\mlRemark}{\dblue{Замечание}}
-\newcommand{\mlConsequence}{\dblue{Следствие}}
-\newcommand{\mlIdea}{\dblue{Идея}}
+\newcommand{\mlBody}{\normalsize}
+\newcommand{\mlDefinition}{\textcolor{defblue}{\bfseries Определение}}
+\newcommand{\mlStatement}{\textcolor{defblue}{\bfseries Утверждение}}
+\newcommand{\mlRemark}{\textcolor{defblue}{\bfseries Замечание}}
+\newcommand{\mlConsequence}{\textcolor{defblue}{\bfseries Следствие}}
+\newcommand{\mlIdea}{\textcolor{defblue}{\bfseries Идея}}
+\newcommand{\mlTask}{\textcolor{defblue}{\bfseries Задача}}
+\newcommand{\mlExample}{\textcolor{defblue}{\bfseries Пример}}
+\newcommand{\mlAlgorithm}{\textcolor{defblue}{\bfseries Алгоритм}}
+\newcommand{\mlSubtask}{\textcolor{defblue}{\bfseries Цель}}
 
 % ------------------------------------------------------------
 % Метаданные
@@ -125,1277 +116,1655 @@
 
 \begin{document}
 
-% ============================================================
-% Титульный слайд
-% ============================================================
-
 \begin{frame}
     \titlepage
 \end{frame}
 
 % ============================================================
-% Глава 1
-% ============================================================
 
 \chapterframe{1}{Постановка задачи машинного обучения}
 
-\begin{frame}{Обучение с учителем}
+\begin{frame}{Обучение с учителем: постановка задачи}
+    \small
     \mlDefinition
 
-    Пусть $\mathcal X$ --- множество объектов, $\mathcal Y$ --- множество допустимых ответов.
-    \textit{Обучающей выборкой} называется конечный набор
-    \[
-        D=\{(x_i,y_i)\}_{i=1}^{n},
-        \qquad x_i\in\mathcal X,\quad y_i\in\mathcal Y.
-    \]
+    Пусть $(\mathsf X,Y)$ --- случайная пара с неизвестным совместным распределением
+    $P_{\mathsf X,Y}$, где $\mathsf X\in\mathcal X$ --- объект, а $Y\in\mathcal Y$ --- его ответ.
 
     \mlDefinition
 
-    В задаче \textit{supervised learning} (обучения с учителем) по выборке $D$
-    требуется построить алгоритм
+    \textit{Обучающей выборкой} называется набор реализаций
     \[
-        f:\mathcal X\to\mathcal Y,
+        D_n=\{(x_i,y_i)\}_{i=1}^{n},
+        \qquad
+        (\mathsf X_i,Y_i)\overset{\mathrm{iid}}{\sim}P_{\mathsf X,Y}.
     \]
-    который по описанию нового объекта $x$ предсказывает соответствующий ответ.
+    Здесь $(\mathsf X_i,Y_i)$ --- независимые одинаково распределённые случайные пары,
+    а $(x_i,y_i)$ --- наблюдаемые значения.
 
-    \mlRemark
+    \mlTask
 
-    Правильные ответы $y_i$ известны только для обучающих объектов; качество модели
-    определяется её способностью переносить найденную закономерность на новые данные.
+    По выборке $D_n$ построить функцию
+    \[
+        f:\mathcal X\to\widehat{\mathcal Y},
+    \]
+    для прогнозирования новых объектов из того же распределения.
+    Здесь $\widehat{\mathcal Y}$ --- пространство прогнозов (в частности, вероятностей классов).
 
     \begin{center}
-        \safeimg[width=0.72\linewidth]{img/supervised_learning_scheme.pdf}
+        \slideimg[width=0.82\linewidth,height=2.40cm,keepaspectratio]
+        {img/supervised_learning_scheme.pdf}
     \end{center}
 \end{frame}
 
-\begin{frame}{Признаковое описание задачи}
+\begin{frame}{Признаки и матричное представление выборки}
+    \mlBody
     \mlDefinition
 
-    Числовым \textit{признаковым описанием} объекта называется вектор
+    Числовым \textit{признаковым описанием} $i$-го объекта называется вектор
     \[
-        x=(x_1,\ldots,x_d)^T\in\mathbb R^d,
+        x_i=
+        (x_{i1},\ldots,x_{id})^T\in\mathbb R^d,
     \]
-    где координаты $x_1,\ldots,x_d$ называются признаками объекта.
+    где $x_{ij}$ --- значение $j$-го признака у $i$-го объекта.
 
-    Таким образом, обучающая выборка имеет вид
+    Выборку удобно записывать в виде матрицы объектов--признаков
     \[
-        D=\{(x_i,y_i)\}_{i=1}^{n},
-        \qquad x_i\in\mathbb R^d.
+        X=
+        \begin{pmatrix}
+        x_1^T\\
+        \vdots\\
+        x_n^T
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+        x_{11}&\cdots&x_{1d}\\
+        \vdots&\ddots&\vdots\\
+        x_{n1}&\cdots&x_{nd}
+        \end{pmatrix}
+        \in\mathbb R^{n\times d},
+        \qquad
+        y=(y_1,\ldots,y_n)^T.
     \]
 
     \mlDefinition
 
     \begin{itemize}
-        \item если $\mathcal Y=\mathbb R$, рассматривается задача \textit{регрессии};
-        \item если $\mathcal Y=\{1,\ldots,K\}$, рассматривается задача \textit{классификации}.
+        \item $\mathcal Y=\mathbb R$ --- \textit{regression} (регрессия);
+        \item $\mathcal Y=\{1,\ldots,K\}$ --- \textit{classification} (классификация).
     \end{itemize}
 
-    \mlRemark
-
-    После перехода к признакам каждый объект соответствует точке в $d$-мерном
-    пространстве, а обучение сводится к поиску зависимости между координатами этой точки
-    и ответом $y$.
+    \mlExample\;
+    Цена квартиры --- регрессия; определение класса изображения --- классификация.
 \end{frame}
 
-\begin{frame}{Модель как параметризованное семейство}
+\begin{frame}{Модель и алгоритм обучения}
+    \mlBody
     \mlDefinition
 
-    \textit{Параметрической моделью} называется семейство отображений
+    \textit{Параметрической моделью} называется семейство функций
     \[
         \mathcal F=
-        \{f_\theta:\mathcal X\to\mathcal Y\mid \theta\in\Theta\},
+        \{f_\theta:\mathcal X\to\widehat{\mathcal Y}\mid\theta\in\Theta\},
     \]
-    где $\Theta$ --- пространство параметров, а $\theta$ --- вектор параметров модели.
+    где $\Theta$ --- пространство параметров модели.
 
-    Если $\Theta\subseteq\mathbb R^m$, то
+    Для объекта $x_i$ модель выдаёт предсказание
     \[
-        \theta=(\theta_1,\ldots,\theta_m)^T.
+        \hat y_i=f_\theta(x_i).
     \]
 
-    \textbf{Пример.}
-    Для семейства прямых
+    \mlExample
+
+    Семейство прямых
     \[
-        f_{w,b}(x)=wx+b
+        f_{w,b}(x)=wx+b,
+        \qquad
+        \theta=(w,b)^T\in\mathbb R^2,
     \]
-    пространство параметров равно $\Theta=\mathbb R^2$, а $\theta=(w,b)^T$.
+    содержит бесконечно много моделей; обучение должно выбрать одну из них.
+
+    \mlDefinition
+
+    \textit{Алгоритм обучения} --- правило, которое по выборке $D_n$
+    выбирает параметры $\hat\theta=A(D_n)$, а значит, конкретную функцию $f_{\hat\theta}$.
 
     \mlRemark
 
-    До обучения задано всё семейство $\mathcal F$; результат обучения --- конкретная
-    функция $f_{\hat\theta}$ с найденным набором параметров $\hat\theta$.
+    Модель и алгоритм обучения --- разные объекты:
+    $\mathcal F$ задаёт, \textit{что} можно получить, алгоритм --- \textit{как} это найти.
+    Формально $A:(\mathcal X\times\mathcal Y)^n\to\Theta$ --- отображение
+    данных в параметры: $D_n\mapsto\hat\theta$.
 \end{frame}
 
-\begin{frame}{Функция потерь и эмпирический риск}
+\begin{frame}{Функция потерь и истинный риск}
+    \mlBody
     \mlDefinition
 
     \textit{Функцией потерь} называется отображение
     \[
-        \ell:\mathcal Y\times\mathcal Y\to\mathbb R_{\ge 0},
+        \ell:\mathcal Y\times\widehat{\mathcal Y}\to\mathbb R_{\ge 0},
     \]
-    где $\ell(y,\hat y)$ измеряет ошибку одного предсказания $\hat y$ при истинном ответе $y$.
+    где $y$ --- истинный ответ, $\hat y$ --- прогноз (например, число или вероятность).
+
+    \mlExample
+
+    Для регрессии часто используется квадратичная потеря
+    \[
+        \ell(y,\hat y)=(y-\hat y)^2.
+    \]
+    Для классификации простейший вариант --- индикатор ошибки
+    \[
+        \ell(y,\hat y)=\mathbf 1\{y\ne\hat y\}.
+    \]
 
     \mlDefinition
 
-    \textit{Эмпирическим риском} модели $f_\theta$ на выборке $D$ называется
-    \[
-        L_D(\theta)
-        =\frac1n\sum_{i=1}^{n}
-        \ell\bigl(y_i,f_\theta(x_i)\bigr).
-    \]
-
-    После фиксации выборки $D$ величина $L_D$ зависит только от параметров модели.
-    Если $\Theta\subseteq\mathbb R^m$, то
-    \[
-        \boxed{L_D:\mathbb R^m\to\mathbb R}
-    \]
-    является функцией нескольких переменных.
-
-    \mlRemark
-
-    Именно эта функция связывает постановку задачи машинного обучения с задачей
-    исследования и минимизации функций нескольких переменных.
-\end{frame}
-
-\begin{frame}{Обучение модели}
-    \mlDefinition
-
-    Обучением параметрической модели называется задача поиска параметров
+    \textit{Истинным риском} модели называется ожидаемая ошибка на новом объекте:
     \[
         \boxed{
-        \hat\theta\in
-        \operatorname*{arg\,min}_{\theta\in\Theta}L_D(\theta)
+        R(\theta)=
+        \mathbb E_{(\mathsf X,Y)\sim P_{\mathsf X,Y}}
+        \bigl[\ell(Y,f_\theta(\mathsf X))\bigr]
         }.
     \]
 
-    В развёрнутом виде:
+    \mlTask\;
+    Идеальная цель обучения --- найти параметры с малым $R(\theta)$.
+\end{frame}
+
+\begin{frame}{Эмпирический риск и принцип ERM}
+    \mlBody
+    Распределение $P_{\mathsf X,Y}$ неизвестно, поэтому истинный риск $R(\theta)$
+    непосредственно вычислить нельзя.
+
+    \mlDefinition
+
+    \textit{Эмпирическим риском} называется средняя ошибка на наблюдаемой выборке:
     \[
-        \hat\theta\in
-        \operatorname*{arg\,min}_{\theta\in\Theta}
-        \frac1n\sum_{i=1}^{n}
-        \ell\bigl(y_i,f_\theta(x_i)\bigr).
+        \boxed{
+        \widehat R_n(\theta)
+        =
+        \frac1n
+        \sum_{i=1}^{n}
+        \ell\bigl(y_i,f_\theta(x_i)\bigr)
+        }.
     \]
 
-    \mlConsequence
+    При фиксированном $\theta$ и стандартных условиях закон больших чисел даёт
+    \[
+        \widehat R_n(\theta)\longrightarrow R(\theta),
+        \qquad n\to\infty.
+    \]
 
-    При $\Theta\subseteq\mathbb R^m$ задача обучения становится задачей оптимизации
-    функции нескольких переменных $L_D(\theta)$.
+    \mlDefinition
+
+    \textit{Empirical Risk Minimization} (минимизация эмпирического риска):
+    \[
+        \boxed{
+        \hat\theta\in
+        \operatorname*{arg\,min}_{\theta\in\Theta}
+        \widehat R_n(\theta)
+        }.
+    \]
+
+    Если $\Theta\subseteq\mathbb R^m$, то
+    $\widehat R_n:\Theta\to\mathbb R$ --- функция нескольких переменных.
+\end{frame}
+
+\begin{frame}{Обобщающая способность и переобучение}
+    \mlBody
+    \mlDefinition
+
+    \textit{Generalization} (обобщающая способность) --- способность модели,
+    обученной на $D_{\mathrm{train}}$, сохранять качество на новых объектах
+    из того же распределения.
+
+    Практически сравнивают ошибку на обучающей и независимой выборках:
+    \[
+        \widehat R_{\mathrm{train}}(\hat\theta),
+        \qquad
+        \widehat R_{\mathrm{test}}(\hat\theta).
+    \]
+
+    \mlDefinition
+
+    \textit{Overfitting} (переобучение) обычно проявляется как ситуация, когда
+    \[
+        \widehat R_{\mathrm{train}}(\hat\theta)
+        \ll
+        \widehat R_{\mathrm{test}}(\hat\theta).
+    \]
+
+    \textit{Underfitting} (недообучение) --- ситуация, когда
+    обе ошибки остаются большими.
 
     \mlRemark
 
-    Разные алгоритмы машинного обучения отличаются выбором семейства $\mathcal F$,
-    функции потерь $\ell$ и метода решения полученной задачи оптимизации.
-
-    % Manim: animations/01_training_process.mp4
-    \begin{center}
-        \href{run:animations/01_training_process.mp4}{%
-        \safeimg[width=0.68\linewidth]{img/01_training_process_poster.png}}
-    \end{center}
+    Минимизация train loss --- средство, а не конечная цель:
+    требуется малый истинный риск $R(\hat\theta)$.
+    Разность $\widehat R_{\mathrm{test}}(\hat\theta)-
+    \widehat R_{\mathrm{train}}(\hat\theta)$ называют \textit{разрывом обобщения};
+    большой положительный разрыв сигнализирует о проблеме.
 \end{frame}
 
-\begin{frame}{Обучающая, валидационная и тестовая выборки}
-    Для оценки способности модели работать на новых данных исходный набор объектов
-    разделяют на непересекающиеся части:
+\begin{frame}{Train, Validation и Test}
+    \mlBody
+    Для независимого контроля качества данные разделяют:
     \[
-        D=D_{\mathrm{train}}\sqcup
-        D_{\mathrm{validation}}\sqcup
+        D=
+        D_{\mathrm{train}}
+        \sqcup
+        D_{\mathrm{validation}}
+        \sqcup
         D_{\mathrm{test}}.
     \]
 
     \begin{itemize}
-        \item $D_{\mathrm{train}}$ используется для определения параметров $\hat\theta$;
-        \item $D_{\mathrm{validation}}$ --- для выбора гиперпараметров и сравнения вариантов модели;
-        \item $D_{\mathrm{test}}$ --- для итоговой оценки качества после завершения обучения.
+        \item $D_{\mathrm{train}}$ --- поиск параметров модели $\hat\theta$;
+        \item $D_{\mathrm{validation}}$ --- выбор гиперпараметров (настроек, не входящих в $\theta$),
+        архитектуры и варианта модели;
+        \item $D_{\mathrm{test}}$ --- итоговая оценка качества после завершения выбора.
     \end{itemize}
 
-    \mlDefinition
-
-    Ошибка на обучающей выборке:
-    \[
-        L_{\mathrm{train}}(\hat\theta).
-    \]
-    Ошибка на тестовой выборке определяется той же функцией потерь, но на объектах,
-    не участвовавших в подборе параметров.
-
     \mlRemark
 
-    Малое значение $L_{\mathrm{train}}$ не гарантирует малого значения тестовой ошибки:
-    модель должна не только описывать обучающие объекты, но и \textit{обобщать} найденную зависимость.
+    Test-выборка не должна использоваться при подборе модели:
+    иначе она перестаёт быть независимой оценкой качества.
+
+    \mlTask
+
+    В следующих главах обозначим $L(\theta)=\widehat R_{\mathrm{train}}(\theta)$. Общий цикл:
+    \[
+        D_{\mathrm{train}}\to\mathcal F\to\ell
+        \to\min L(\theta)\to\mathrm{validation}\to\mathrm{test}.
+    \]
 
     \begin{center}
-        \safeimg[width=0.76\linewidth]{img/train_val_test.pdf}
+        \slideimg[width=0.84\linewidth,height=1.45cm,keepaspectratio]
+        {img/train_val_test.pdf}
     \end{center}
 \end{frame}
 
 % ============================================================
+
 % Глава 2
-% ============================================================
-
 \chapterframe{2}{Линейные модели}
+\begin{frame}{Linear Regression: определение модели}
+    \mlBody
+    \mlTask\; По $x\in\mathbb R^d$ предсказать число $y\in\mathbb R$.
 
-\begin{frame}{Linear Regression (линейная регрессия)}
-    \mlDefinition
-
-    \textit{Линейной регрессионной моделью} называется функция
+    \mlDefinition\; \textit{Линейная регрессия} (Linear Regression):
     \[
-        f_\theta(x)=x^T\theta,
-        \qquad x,\theta\in\mathbb R^d.
+        f_{w,b}(x)=w^Tx+b=\sum_{j=1}^{d}w_jx_j+b,
+        \qquad w\in\mathbb R^d,\quad b\in\mathbb R.
     \]
+    Здесь $w_j$ --- коэффициенты признаков, $b$ --- свободный член.
 
-    Свободный коэффициент можно включить в вектор параметров,
-    добавив к признаковому вектору единичную координату.
-
-    Для одного признака получаем
+    \mlDefinition\; Для единой записи вводят \textit{фиктивный признак} $x_0=1$:
     \[
-        \hat y=f_{w,b}(x)=wx+b.
+       \widetilde x=(1,x_1,\ldots,x_d)^T,\qquad
+       \theta=(b,w_1,\ldots,w_d)^T,
+       \qquad f_\theta(\widetilde x)=\widetilde x^T\theta.
     \]
+    Итак, $\widetilde x,\theta\in\mathbb R^{d+1}$. Для выборки обозначим через $\widetilde X$ матрицу строк $\widetilde x_i^T$.
 
-    \mlRemark
+    \mlExample\; При $d=1$ получаем прямую
+    $\hat y=wx+b$; например, $w=2$, $b=1$ дают
+    $f(3)=2\cdot3+1=7$.
 
-    Слово «линейная» относится к зависимости от параметров.
-    Например,
-    \[
-        \hat y=\theta_0+\theta_1x+\theta_2x^2
-    \]
-    остаётся линейной моделью по параметрам $\theta_0,\theta_1,\theta_2$.
-
-    \begin{center}
-        \safeimg[width=0.72\linewidth]{img/linear_regression.pdf}
-    \end{center}
+    \mlRemark\; Линейность здесь означает линейность \textit{по параметрам}:
+    $\theta_0+\theta_1x+\theta_2x^2$ также линейна по $\theta$.
 \end{frame}
 
-\begin{frame}{Mean Squared Error (среднеквадратичная ошибка)}
-    Для объекта $(x_i,y_i)$ определим остаток
+\begin{frame}{Геометрия линейной регрессии: данные и остатки}
+    \mlBody
+    Каждая точка $(x_i,y_i)$ --- наблюдение; линия --- прогноз
+    $\hat y_i=wx_i+b$. При изменении $w,b$ меняются прогнозы и ошибки.
+
+    \begin{center}
+        \slideimg[width=0.93\linewidth,height=5.36cm,keepaspectratio]
+        {img/linear_regression.pdf}
+    \end{center}
+    \mlRemark\; Вертикальное отклонение точки от прямой --- остаток
+    $r_i=y_i-\hat y_i$; минимизировать будем \textit{сумму квадратов} таких отклонений.
+\end{frame}
+
+\begin{frame}{Остатки и Mean Squared Error}
+    \mlBody
+    \mlDefinition\; \textit{Остаток} (residual) на $i$-м объекте:
     \[
-        r_i=y_i-f_\theta(x_i).
+        r_i=y_i-\hat y_i=y_i-f_\theta(\widetilde x_i).
     \]
-
-    \mlDefinition
-
-    Квадратичная функция потерь:
+    \mlDefinition\; Квадратичная потеря и её среднее по выборке:
     \[
-        \ell(y,\hat y)=(y-\hat y)^2.
+        \ell(y_i,\hat y_i)=(y_i-\hat y_i)^2,
+        \qquad
+        \boxed{L(\theta)=\operatorname{MSE}(\theta)
+        =\frac1n\sum_{i=1}^{n}r_i^2}.
     \]
-    Соответствующий эмпирический риск имеет вид
+    \mlExample\; Пусть $x=(0,1,2)$, $y=(1,2,2)$, а $f(x)=x+1$.
+    Тогда
     \[
-        L(\theta)=
-        \frac1n\sum_{i=1}^{n}
-        \bigl(y_i-x_i^T\theta\bigr)^2.
+        \hat y=(1,2,3),\quad r=(0,0,-1),\quad
+        L=\frac{0^2+0^2+(-1)^2}{3}=\frac13.
     \]
+    \mlRemark\; Возведение в квадрат убирает знак ошибок и сильнее
+    штрафует большие отклонения: $|r|=2$ даёт потерю $4$, а $|r|=1$ --- $1$.
 
-    Если строки матрицы $X\in\mathbb R^{n\times d}$ равны $x_i^T$, а
-    $Y=(y_1,\ldots,y_n)^T$, то
+    \mlTask\; Найти $\hat\theta\in\operatorname*{arg\,min}_{\theta}L(\theta)$.
+\end{frame}
+
+\begin{frame}{Матричная запись MSE}
+    \mlBody
+    Расширенная матрица $\widetilde X$ содержит единичный первый столбец и $d$ исходных признаков:
     \[
-        \boxed{L(\theta)=\frac1n\|Y-X\theta\|_2^2}.
+        \widetilde X=\begin{pmatrix}
+           1 & x_{11}&\cdots&x_{1d}\\
+           \vdots&\vdots&&\vdots\\
+           1&x_{n1}&\cdots&x_{nd}
+        \end{pmatrix}\in\mathbb R^{n\times(d+1)},
+        \quad \theta\in\mathbb R^{d+1}.
     \]
-
-    \mlRemark
-
-    Возведение остатка в квадрат исключает взаимную компенсацию положительных и
-    отрицательных ошибок и сильнее штрафует большие отклонения.
+    Поэтому вектор всех предсказаний и остатков имеет вид
+    \[
+        \hat y=\widetilde X\theta\in\mathbb R^n,\qquad
+        r=y-\widetilde X\theta\in\mathbb R^n.
+    \]
+    \mlStatement\; Поскольку $\|r\|_2^2=r^Tr=\sum_i r_i^2$,
+    \[
+        \boxed{L(\theta)=\frac1n\|y-\widetilde X\theta\|_2^2
+        =\frac1n(y-\widetilde X\theta)^T(y-\widetilde X\theta)}.
+    \]
+    \mlConsequence\; Это функция от $(d+1)$ переменной, а не от объектов
+    выборки: при обучении меняется $\theta$, тогда как $X$ и $y$ зафиксированы.
 \end{frame}
 
 \begin{frame}{MSE как функция нескольких переменных}
-    Для модели одного признака
+    \mlBody
+    Для единственного признака $\theta=(b,w)$ и
     \[
-        f_{w,b}(x)=wx+b
+        L(w,b)=\frac1n\sum_{i=1}^{n}(y_i-wx_i-b)^2,
+        \qquad L:\mathbb R^2\to\mathbb R.
     \]
-    функция потерь принимает вид
-    \[
-        L(w,b)=
-        \frac1n\sum_{i=1}^{n}(y_i-wx_i-b)^2.
-    \]
+    При каждом $(w,b)$ выбирается своя прямая и вычисляется её ошибка.
 
-    Следовательно,
-    \[
-        L:\mathbb R^2\to\mathbb R.
-    \]
+    \mlStatement\; $L(w,b)$ --- квадратичная функция по двум параметрам;
+    её график --- поверхность в пространстве $(w,b,L)$.
 
-    Множества
-    \[
-        \{(w,b):L(w,b)=C\}
-    \]
-    являются линиями уровня функции потерь.
+    \mlRemark\; Точки минимума соответствуют параметрам прямой,
+    наилучшей по MSE. Как найти их численно, разберём в главе 3.
 
-    \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.96\linewidth]{img/mse_surface.pdf}
-
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.96\linewidth]{img/mse_contours.pdf}
-    \end{columns}
-
-    \mlConsequence\;
-    Минимум поверхности соответствует параметрам наилучшей прямой в смысле MSE.
-\end{frame}
-
-\begin{frame}{Градиент MSE}
-    \small
-    \mlStatement
-
-    Для
-    \[
-        L(\theta)=\frac1n\|Y-X\theta\|_2^2
-    \]
-    градиент по параметрам равен
-    \[
-        \boxed{
-        \nabla_\theta L(\theta)
-        =\frac{2}{n}X^T(X\theta-Y)
-        }.
-    \]
-
-    В координатной форме
-    \[
-        \nabla L(\theta)=
-        \begin{pmatrix}
-            \dfrac{\partial L}{\partial\theta_1}\\
-            \vdots\\
-            \dfrac{\partial L}{\partial\theta_d}
-        \end{pmatrix}.
-    \]
-
-    \mlRemark
-
-    Частная производная $\partial L/\partial\theta_j$ характеризует локальную
-    чувствительность ошибки к изменению $j$-го параметра при фиксированных остальных.
-    Градиент объединяет эти величины в один вектор.
-
-    % Manim: animations/02_linear_regression_loss.mp4
     \begin{center}
-        \href{run:animations/02_linear_regression_loss.mp4}{%
-        \safeimg[width=0.64\linewidth]{img/02_linear_regression_loss_poster.png}}
+        \slideimg[width=0.90\linewidth,height=3.80cm,keepaspectratio]
+        {img/mse_surface.pdf}
     \end{center}
 \end{frame}
 
-\begin{frame}{Logistic Regression (логистическая регрессия)}
-    Рассмотрим бинарную классификацию:
-    \[
-        y\in\{0,1\}.
-    \]
-
-    Линейный score
-    \[
-        z=x^T\theta
-    \]
-    принимает произвольные вещественные значения и потому не может непосредственно
-    интерпретироваться как вероятность.
-
-    \mlDefinition
-
-    В \textit{Logistic Regression} вероятность класса $1$ задаётся
-    \[
-        p_\theta(x)=P_\theta(Y=1\mid x)=\sigma(x^T\theta),
-    \]
-    где
-    \[
-        \boxed{\sigma(z)=\frac{1}{1+e^{-z}}}.
-    \]
-
-    При стандартном пороге $1/2$
-    \[
-        \hat y=\mathbb I\{p_\theta(x)\ge 1/2\}.
-    \]
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/sigmoid.pdf}
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/logistic_boundary.pdf}
-    \end{columns}
+\begin{frame}{Линии уровня MSE: геометрический смысл}
+\mlBody
+\mlDefinition\; \textit{Линия уровня} функции $L(w,b)$ при $c\in\mathbb R$:
+\[
+    \mathcal C_c=\{(w,b):L(w,b)=c\}.
+\]
+Чем ближе линия уровня к минимуму, тем меньшей сумме квадратов
+остатков соответствуют параметры.
+\begin{center}
+    \slideimg[width=0.91\linewidth,height=4.15cm,keepaspectratio]{img/mse_contours.pdf}
+\end{center}
+\mlRemark\; В точках, где $\nabla L\ne0$, градиент перпендикулярен
+линии уровня: при движении вдоль неё значение $L$ локально не меняется.
 \end{frame}
 
-\begin{frame}{Maximum Likelihood и Cross-Entropy}
-    Пусть
+
+\begin{frame}{Как дифференцировать MSE: случай $d=1$}
+    \mlBody
+    Для $f_{w,b}(x)=wx+b$ положим $e_i=wx_i+b-y_i$.
+    Тогда $L(w,b)=\frac1n\sum_i e_i^2$.
+
+    По \textit{правилу цепочки}, поскольку
+    $\partial e_i/\partial w=x_i$, а $\partial e_i/\partial b=1$,
     \[
-        p_i=p_\theta(x_i)=P_\theta(Y_i=1\mid x_i).
+       \frac{\partial e_i^2}{\partial w}=2e_ix_i,
+       \qquad
+       \frac{\partial e_i^2}{\partial b}=2e_i.
     \]
-    Тогда вероятность наблюдать ответ $y_i\in\{0,1\}$ равна
+    \mlStatement\; Частные производные функции потерь:
     \[
-        p_i^{y_i}(1-p_i)^{1-y_i}.
+        \boxed{\frac{\partial L}{\partial w}
+        =\frac2n\sum_{i=1}^{n}(wx_i+b-y_i)x_i},
     \]
-
-    При условной независимости наблюдений функция правдоподобия:
     \[
-        \mathcal L(\theta)
-        =\prod_{i=1}^{n}p_i^{y_i}(1-p_i)^{1-y_i}.
+        \boxed{\frac{\partial L}{\partial b}
+        =\frac2n\sum_{i=1}^{n}(wx_i+b-y_i)}.
     \]
+    \mlRemark\; Градиент $\nabla L=(\partial L/\partial b,
+    \partial L/\partial w)^T$ показывает, как ошибка меняется
+    при малом изменении каждого параметра.
+\end{frame}
 
-    \mlStatement
-
-    Максимизация $\mathcal L(\theta)$ эквивалентна минимизации отрицательного
-    среднего лог-правдоподобия:
+\begin{frame}{Градиент MSE в общем случае}
+    \mlBody
+    Запишем $e_i=\widetilde x_i^T\theta-y_i$; тогда
     \[
-        \boxed{
-        L(\theta)=
-        -\frac1n\sum_{i=1}^{n}
-        \left[y_i\log p_i+(1-y_i)\log(1-p_i)\right]
-        }.
+       L(\theta)=\frac1n\sum_{i=1}^{n}e_i^2,
+       \qquad \frac{\partial e_i}{\partial\theta_j}=\widetilde x_{ij},
+       \quad j=0,\ldots,d.
     \]
+    Снова применяем правило цепочки:
+    \[
+       \frac{\partial L}{\partial\theta_j}
+       =\frac1n\sum_i 2e_i\frac{\partial e_i}{\partial\theta_j}
+       =\frac2n\sum_i \widetilde x_{ij}(\widetilde x_i^T\theta-y_i).
+    \]
+    Здесь $\widetilde X^T(\widetilde X\theta-y)$ --- вектор, $j$-я компонента которого
+    равна сумме в правой части без множителя $2/n$.
 
-    \mlDefinition\;
-    Эта функция называется \textit{binary cross-entropy} (бинарной кросс-энтропией).
+    \mlStatement\; Собирая частные производные, получаем
+    \[
+        \boxed{\nabla_\theta L(\theta)=\frac2n\widetilde X^T(\widetilde X\theta-y)}
+        \quad\in\mathbb R^{d+1}.
+    \]
+    \mlConsequence\; Минимум гладкой функции (во внутренней точке)
+    может достигаться только при $\nabla_\theta L=0$.
+\end{frame}
 
-    % Manim: animations/03_logistic_sigmoid.mp4
+\begin{frame}{Logistic Regression: зачем нужна сигмоида}
+    \mlBody
+    \mlTask\; Предсказать класс $Y\in\{0,1\}$ и вероятность
+    $p_\theta(x)=P_\theta(Y=1\mid \mathsf X=x)$.
+
+    \mlDefinition\; Сначала вычисляется \textit{линейный score}
+    \[
+        z=w^Tx+b=\widetilde x^T\theta\in\mathbb R.
+    \]
+    Но $z$ не обязан принадлежать $[0,1]$, поэтому сам по себе
+    не может быть вероятностью.
+
+    \mlDefinition\; \textit{Odds} (шансы) события при вероятности $p$
+    равны $p/(1-p)$. \textit{Log-odds} --- их логарифм:
+    \[
+       \operatorname{logit}(p)=\log\frac{p}{1-p}.
+    \]
+    \mlStatement\; В \textit{логистической регрессии} принимают модель
+    \[
+       \boxed{\operatorname{logit}(p_\theta(x))=w^Tx+b=z}.
+    \]
+    \mlExample\; При $p=3/4$ шансы равны $3$, а log-odds $=\log3$.
+\end{frame}
+
+\begin{frame}{Вывод сигмоиды из log-odds}
+    \mlBody
+    Предположим, что $\log\frac{p}{1-p}=z$. Выразим $p$:
+    \[
+       \log\frac{p}{1-p}=z
+       \quad\Longrightarrow\quad
+       \frac{p}{1-p}=e^z,
+    \]
+    \[
+       p=e^z(1-p)
+       \quad\Longrightarrow\quad
+       p(1+e^z)=e^z,
+    \]
+    \[
+       \boxed{p=\frac{e^z}{1+e^z}=\frac1{1+e^{-z}}=\sigma(z)}.
+    \]
+    \mlDefinition\; $\sigma:\mathbb R\to(0,1)$ ---
+    \textit{sigmoid} (логистическая функция).
+
+    \mlStatement\; $\sigma(0)=1/2$,
+    $\lim_{z\to-\infty}\sigma(z)=0$,
+    $\lim_{z\to+\infty}\sigma(z)=1$.
+
+    По правилу цепочки
+    \[
+       \boxed{\sigma'(z)=\frac{e^{-z}}{(1+e^{-z})^2}
+       =\sigma(z)\bigl(1-\sigma(z)\bigr)>0}.
+    \]
+    Поэтому вероятность класса $1$ растёт вместе со score $z$.
+\end{frame}
+
+\begin{frame}{График сигмоиды}
+    \mlBody
+    \mlStatement\; Линейный score $z$ переводится в вероятность
+    $p=\sigma(z)$; центральная точка графика имеет координаты $(0,1/2)$.
     \begin{center}
-        \href{run:animations/03_logistic_sigmoid.mp4}{%
-        \safeimg[width=0.56\linewidth]{img/03_logistic_sigmoid_poster.png}}
+        \slideimg[width=0.93\linewidth,height=5.25cm,keepaspectratio]
+        {img/sigmoid.pdf}
     \end{center}
+    \mlExample\; Если $z=\log3$, то $p=3/4$;
+    если $z=-\log3$, то $p=1/4$.
 \end{frame}
 
-% ============================================================
+
+
+\begin{frame}{Геометрия логистической классификации}
+    \mlBody
+    При пороге $1/2$ и монотонности $\sigma$:
+    \[
+       \widehat y=1\iff p_\theta(x)\ge\tfrac12
+       \iff w^Tx+b\ge0.
+    \]
+    \mlDefinition\; Граница решения: $\{x:w^Tx+b=0\}$ --- гиперплоскость (если $w\ne0$).
+    \begin{center}
+        \slideimg[width=0.93\linewidth,height=3.82cm,keepaspectratio]
+        {img/logistic_boundary.pdf}
+    \end{center}
+    \mlRemark\; На графике показана линейная граница,
+    хотя сама вероятность $p_\theta(x)=\sigma(w^Tx+b)$ нелинейна по $x$.
+    Например, для $w=(1,-1)^T$, $b=0$ граница имеет вид $x_1=x_2$.
+\end{frame}
+
+\begin{frame}{Модель Бернулли и функция правдоподобия}
+    \mlBody
+    Для объекта $x_i$ обозначим
+    $p_i=\sigma(\widetilde x_i^T\theta)$.
+
+    \mlDefinition\; При фиксированном $x_i$ модель задаёт
+    \[
+       Y_i\mid \mathsf X_i=x_i\sim\operatorname{Bern}(p_i),
+       \qquad
+       P_\theta(Y_i=y_i\mid x_i)=p_i^{y_i}(1-p_i)^{1-y_i}.
+    \]
+    Действительно, если $y_i=1$, получаем $p_i$;
+    если $y_i=0$, получаем $1-p_i$.
+
+    При условной независимости ответов \textit{likelihood}
+    (правдоподобие) всей наблюдаемой выборки равно
+    \[
+       \boxed{\mathcal L(\theta)=
+       \prod_{i=1}^{n}p_i^{y_i}(1-p_i)^{1-y_i}}.
+    \]
+    \mlTask\; \textit{Maximum Likelihood Estimation} (MLE):
+    \[
+        \hat\theta\in\operatorname*{arg\,max}_\theta\mathcal L(\theta).
+    \]
+    \mlRemark\; $\mathcal L(\theta)$ рассматривается как функция параметров:
+    ответы $y_i$ уже известны, изменяются только $p_i$.
+\end{frame}
+
+\begin{frame}{Вывод Binary Cross-Entropy из MLE}
+    \mlBody
+    Логарифм строго возрастает, поэтому максимумы $\mathcal L$
+    и $\log\mathcal L$ достигаются при тех же параметрах.
+
+    Применяем $\log(ab)=\log a+\log b$ и $\log(a^c)=c\log a$:
+    \[
+       \log\mathcal L(\theta)
+       =\sum_{i=1}^{n}\Bigl(y_i\log p_i
+       +(1-y_i)\log(1-p_i)\Bigr).
+    \]
+    Чтобы получить \textit{задачу минимизации}, меняем знак и делим
+    на $n$ (положительный множитель не меняет оптимум):
+    \[
+       \boxed{L(\theta)=-\frac1n\sum_{i=1}^{n}
+       \Bigl[y_i\log p_i+(1-y_i)\log(1-p_i)\Bigr]}.
+    \]
+    \mlDefinition\; $L$ --- \textit{Binary Cross-Entropy} (BCE),
+    или средняя отрицательная логарифмическая вероятность правильного ответа.
+
+    \mlExample\; Для одного наблюдения с $y=1$ потеря равна $-\log p$:
+    прогноз $p=0.9$ даёт примерно $0.105$, а $p=0.1$ --- примерно $2.303$.
+    Уверенная ошибка наказывается сильнее.
+
+    \mlConsequence\; $\operatorname*{arg\,max}_\theta\mathcal L(\theta)
+    =\operatorname*{arg\,min}_\theta L(\theta)$.
+\end{frame}
+
+\begin{frame}{Градиент BCE: правило цепочки}
+    \mlBody
+    Для одного объекта положим $z_i=\widetilde x_i^T\theta$,
+    $p_i=\sigma(z_i)$ и
+    \[
+       \ell_i=-y_i\log p_i-(1-y_i)\log(1-p_i).
+    \]
+    Последовательно дифференцируем:
+    \[
+       \frac{\partial\ell_i}{\partial p_i}
+       =-\frac{y_i}{p_i}+\frac{1-y_i}{1-p_i}
+       =\frac{p_i-y_i}{p_i(1-p_i)},
+    \]
+    \[
+       \frac{\partial p_i}{\partial z_i}=p_i(1-p_i),
+       \qquad
+       \boxed{\frac{\partial\ell_i}{\partial z_i}=p_i-y_i}.
+    \]
+    Ещё один шаг по правилу цепочки:
+    \[
+       \frac{\partial z_i}{\partial\theta_j}=\widetilde x_{ij}
+       \quad\Longrightarrow\quad
+       \frac{\partial\ell_i}{\partial\theta_j}
+       =(p_i-y_i)\widetilde x_{ij}.
+    \]
+    \mlStatement\; Для всей выборки
+    \[
+        \boxed{\nabla_\theta L(\theta)=\frac1n\widetilde X^T(p-y)},
+        \qquad p=(p_1,\ldots,p_n)^T.
+    \]
+\end{frame}
+
+
+
 % Глава 3
-% ============================================================
-
 \chapterframe{3}{Градиентные методы оптимизации}
-
-\begin{frame}{Геометрический смысл градиента}
-    Пусть
+\begin{frame}{Зачем нужна численная оптимизация}
+    \mlBody
+    В предыдущей главе обучение свелось к поиску минимума
+    эмпирического риска:
     \[
-        L:\mathbb R^d\to\mathbb R
+        \boxed{\hat\theta\in\operatorname*{arg\,min}_{\theta\in\Theta}L(\theta)},
+        \qquad L:\mathbb R^m\to\mathbb R.
     \]
-    дифференцируема в точке $\theta$.
 
-    \mlStatement
+    \mlExample\; Для рассмотренных линейных моделей
+    \[
+    \begin{aligned}
+        L_{\mathrm{MSE}}(\theta)&=\frac1n\|\widetilde X\theta-y\|_2^2,\\
+        L_{\mathrm{BCE}}(\theta)&=-\frac1n\sum_{i=1}^n
+        \bigl[y_i\log p_i+(1-y_i)\log(1-p_i)\bigr].
+    \end{aligned}
+    \]
+    Для MSE функция потерь квадратичная; для BCE общего явного решения нет.
 
-    Производная $L$ по единичному направлению $v$, $\|v\|=1$, равна
+    \mlTask\; Построить последовательность $\theta_0,\theta_1,\ldots$,
+    вдоль которой значение функции потерь становится меньше.
+
+    \mlIdea\; Если известны частные производные $L$, можно использовать
+    локальную информацию о её изменении, не решая уравнение минимума явно.
+    Следующий шаг --- выбрать направление, в котором линейное
+    приближение $L$ убывает быстрее всего.
+\end{frame}
+
+
+
+\begin{frame}{Почему именно антиградиент?}
+    \mlBody
+    Пусть $L:\mathbb R^m\to\mathbb R$ дифференцируема, а $\nabla L$ --- вектор её частных производных.\par\medskip
+    \mlDefinition\; \textit{Производная по направлению} единичного
+    вектора $v$, $\|v\|=1$, задаётся равенством
     \[
         D_vL(\theta)=\langle\nabla L(\theta),v\rangle.
     \]
-
-    Из неравенства Коши--Буняковского
+    По неравенству Коши--Буняковского
     \[
-        -\|\nabla L(\theta)\|
-        \le D_vL(\theta)
-        \le \|\nabla L(\theta)\|.
+        -\|\nabla L(\theta)\|\le D_vL(\theta)
+        \le\|\nabla L(\theta)\|.
     \]
-
-    Наибольшее локальное убывание достигается в направлении
+    \mlStatement\; При $\nabla L(\theta)\ne0$ наибольшее
+    \emph{локальное} убывание среди единичных направлений достигается при
     \[
-        \boxed{
-        v=-\frac{\nabla L(\theta)}{\|\nabla L(\theta)\|}
-        }.
+        \boxed{v_{\min}=-\frac{\nabla L(\theta)}
+        {\|\nabla L(\theta)\|}}.
     \]
-
-    \mlRemark\;
-    Градиент ортогонален линии уровня в регулярной точке функции.
-
-    \begin{center}
-        \safeimg[width=0.65\linewidth]{img/gradient_geometry.pdf}
-    \end{center}
+    \mlRemark\; При $\Delta\theta=-\eta\nabla L(\theta)$
+    линейное приближение даёт изменение
+    $-\eta\|\nabla L(\theta)\|^2<0$ при $\nabla L\ne0$.
+    Реальный конечный шаг может вести себя иначе: вывод локальный.
 \end{frame}
 
-\begin{frame}{Gradient Descent (градиентный спуск)}
-    \mlDefinition
+\begin{frame}{Геометрия градиента и линий уровня}
+    \mlBody
+    На карте линий уровня $L(\theta)=c$ градиент в регулярной точке
+    перпендикулярен линии уровня и направлен в сторону возрастания $L$.
+    Антиградиент показывает направление наиболее быстрого
+    \emph{локального} убывания.
 
-    \textit{Gradient Descent} задаётся последовательностью
+    \begin{center}
+        \slideimg[width=0.88\linewidth,height=4.62cm,keepaspectratio]
+        {img/gradient_geometry.pdf}
+    \end{center}
+    \mlRemark\; Изображена геометрия одного шага;
+    траектория метода складывается из многих таких шагов.
+\end{frame}
+
+\begin{frame}{Gradient Descent: формула и алгоритм}
+    \mlBody
+    \mlDefinition\; \textit{Gradient Descent (градиентный спуск)} ---
+    итерационный метод, в котором
     \[
-        \boxed{
-        \theta_{t+1}
-        =\theta_t-\eta_t\nabla L(\theta_t)
-        },
+        \boxed{\theta_{t+1}=\theta_t-\eta_t\nabla L(\theta_t)},
+        \qquad \eta_t>0.
     \]
-    где $\eta_t>0$ --- \textit{learning rate} (скорость обучения).
+    Здесь $\theta_t\in\mathbb R^m$ --- текущие параметры,
+    $\eta_t$ --- \textit{learning rate} (размер шага обучения).
 
-    На каждой итерации выполняются два шага:
+    \mlAlgorithm
     \begin{enumerate}
-        \item вычисляется градиент $\nabla L(\theta_t)$;
-        \item параметры изменяются в направлении антиградиента.
+        \item Задать начальное приближение $\theta_0$ и правило выбора $\eta_t$.
+        \item Вычислить $g_t=\nabla L(\theta_t)$.
+        \item Обновить параметры: $\theta_{t+1}=\theta_t-\eta_t g_t$.
+        \item Повторять до выполнения критерия остановки.
     \end{enumerate}
 
-    \mlRemark
+    \mlRemark\; Возможные критерии: малость $\|g_t\|$,
+    изменение $L(\theta_t)$ или ограничение числа итераций.
+    Ненулевой шаг сам по себе не гарантирует уменьшения функции.
+\end{frame}
 
-    Метод использует только локальную информацию о функции $L$ и не требует явного
-    аналитического выражения точки минимума.
-
-    \mlConsequence
-
-    При удачном выборе $\eta_t$ последовательность $L(\theta_t)$ должна уменьшаться,
-    а параметры $\theta_t$ --- приближаться к стационарной точке.
-
-    % Manim: animations/04_gradient_descent.mp4
+\begin{frame}{Пример: несколько итераций вручную}
+    \mlBody
+    \mlExample\; Минимизируем $L(u)=(u-2)^2$ из точки $u_0=0$
+    при постоянном шаге $\eta=\frac14$.
+    \[
+        L'(u)=2(u-2),\qquad
+        u_{t+1}=u_t-\tfrac14\,2(u_t-2)
+        =\tfrac12u_t+1.
+    \]
     \begin{center}
-        \href{run:animations/04_gradient_descent.mp4}{%
-        \safeimg[width=0.64\linewidth]{img/04_gradient_descent_poster.png}}
+        \begin{tabular}{c|c|c|c}
+            $t$ & $u_t$ & $L'(u_t)$ & $L(u_t)$\\\hline
+            $0$ & $0$ & $-4$ & $4$\\
+            $1$ & $1$ & $-2$ & $1$\\
+            $2$ & $\frac32$ & $-1$ & $\frac14$\\
+            $3$ & $\frac74$ & $-\frac12$ & $\frac1{16}$
+        \end{tabular}
     \end{center}
+
+    \mlConsequence\; Каждый шаг сокращает расстояние до $u^*=2$
+    вдвое; ошибка по функции уменьшается вчетверо.
+    \[
+        u_t=2-2\left(\tfrac12\right)^t,
+        \qquad L(u_t)=4\left(\tfrac14\right)^t\to0.
+    \]
 \end{frame}
 
-\begin{frame}{Влияние learning rate}
-    Значение $\eta$ определяет длину шага вдоль антиградиента.
+\begin{frame}{Влияние learning rate: иллюстрация}
+    \mlBody
+    Слишком малый шаг замедляет движение, слишком большой
+    может приводить к перескакиванию через минимум и расходимости.
 
-    Для одномерной функции
-    \[
-        f(u)=u^2
-    \]
-    итерация Gradient Descent принимает вид
-    \[
-        u_{t+1}=u_t-2\eta u_t=(1-2\eta)u_t.
-    \]
-
-    Отсюда непосредственно видно, что характер последовательности зависит от $\eta$.
-
-    \begin{itemize}
-        \item малое $\eta$ --- устойчивое, но медленное уменьшение ошибки;
-        \item умеренное $\eta$ --- быстрая сходимость;
-        \item большое $\eta$ --- колебания около минимума;
-        \item чрезмерно большое $\eta$ --- расходимость.
-    \end{itemize}
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/learning_rate.pdf}
-        \column{0.50\textwidth}
-        \centering
-        % Manim: animations/05_learning_rate.mp4
-        \safeanimation[width=0.95\linewidth]{img/05_learning_rate_poster.png}{animations/05_learning_rate.mp4}
-    \end{columns}
+    \begin{center}
+        \slideimg[width=0.98\linewidth,height=4.53cm,keepaspectratio]
+        {img/learning_rate.pdf}
+    \end{center}
+    \mlRemark\; На схеме показаны возможные режимы траекторий;
+    поведение зависит также от геометрии конкретной функции потерь.
 \end{frame}
 
-\begin{frame}{Momentum и Nesterov}
-    Пусть $g_t=\nabla L(\theta_t)$.
-
-    \mlDefinition\; \textbf{Momentum (метод момента)}
+\begin{frame}{Полный и стохастический градиенты}
+    \mlBody
+    Эмпирический риск является средним по выборке:
     \[
-        v_t=\beta v_{t-1}+g_t,
-        \qquad
-        \theta_{t+1}=\theta_t-\eta v_t,
+        L(\theta)=\frac1n\sum_{i=1}^n\ell_i(\theta),
+        \qquad \ell_i(\theta)=\ell(y_i,f_\theta(x_i)).
+    \]
+    \mlDefinition\; При \textit{Batch Gradient Descent}
+    используется градиент всей суммы:
+    \[
+        g_t=\nabla L(\theta_t)
+        =\frac1n\sum_{i=1}^n\nabla\ell_i(\theta_t).
+    \]
+    \mlDefinition\; В \textit{Mini-batch SGD} вычисляют
+    приближение по случайной подвыборке индексов $B_t$:
+    \[
+        \boxed{g_t=\frac1{|B_t|}\sum_{i\in B_t}
+        \nabla\ell_i(\theta_t)},\qquad
+        \theta_{t+1}=\theta_t-\eta_t g_t.
+    \]
+    При равномерном выборе индексов такое среднее в среднем
+    направлено как полный градиент.
+
+    \mlRemark\; Mini-batch дешевле одной полной итерации,
+    но даёт шумное направление. Далее $g_t$ --- вычисленный на шаге градиент
+    (полный или по mini-batch).
+\end{frame}
+
+\begin{frame}{Momentum: зачем учитывать предыдущие шаги?}
+    \mlBody
+    Вытянутые линии уровня означают разные масштабы изменения функции
+    по разным направлениям. Обычный GD может сильно колебаться
+    поперёк узкой долины и медленно идти вдоль неё.
+
+    \mlIdea\; Сохранять накопленное направление движения,
+    сглаживая изменения градиента между итерациями.
+
+    \mlDefinition\; \textit{Momentum (метод момента)}:
+    \[
+    \begin{aligned}
+        v_{t+1}&=\beta v_t+g_t,\qquad v_0=0,\\
+        \theta_{t+1}&=\theta_t-\eta v_{t+1},
         \qquad 0\le\beta<1.
+    \end{aligned}
     \]
+    Здесь $v_t$ --- накопленное направление,
+    $\beta$ --- коэффициент сохранения предыдущего направления.
 
-    Вектор $v_t$ аккумулирует информацию о предыдущих направлениях движения.
-    Это уменьшает поперечные колебания в вытянутых долинах функции потерь.
+    \mlRemark\; Если $\beta=0$, получаем обычный GD.
+    При близких направлениях градиентов они накапливаются;
+    при чередовании знаков в одной координате --- частично компенсируются.
+\end{frame}
 
-    \mlDefinition\; \textbf{Nesterov Momentum (метод Нестерова)}
+\begin{frame}{Momentum: геометрия узкой долины}
+\mlBody
+\mlExample\; Для $L(u,v)=10u^2+v^2$ имеем
+\[
+   \nabla L(u,v)=(20u,2v)^T.
+\]
+Изменение вдоль координаты $u$ намного резче; обычный GD с заметным
+шагом может многократно пересекать долину поперёк.
+\begin{center}
+    \slideimg[width=0.88\linewidth,height=3.95cm,keepaspectratio]{img/momentum_valley.pdf}
+\end{center}
+\mlConsequence\; Momentum накапливает устойчивое направление вдоль
+долины и частично гасит чередующиеся поперечные шаги.
+\end{frame}
+
+
+\begin{frame}{Nesterov Momentum: шаг с опережением}
+    \mlBody
+    \mlIdea\; Обычный Momentum вычисляет градиент в $\theta_t$,
+    а затем делает инерционный шаг. Метод Нестерова сначала учитывает
+    предполагаемое перемещение по инерции.
+
+    \mlDefinition\; \textit{Nesterov Momentum (метод Нестерова)}
+    в одной из стандартных форм записи:
     \[
-        g_t=
-        \nabla L\!\left(\theta_t-\eta\beta v_{t-1}\right),
+    \begin{aligned}
+        \theta_t^{\mathrm{look}}&=\theta_t-\eta\beta v_t,\\
+        g_t&=\nabla L(\theta_t^{\mathrm{look}}),\\
+        v_{t+1}&=\beta v_t+g_t,\\
+        \theta_{t+1}&=\theta_t-\eta v_{t+1}.
+    \end{aligned}
     \]
-    \[
-        v_t=\beta v_{t-1}+g_t,
-        \qquad
-        \theta_{t+1}=\theta_t-\eta v_t.
-    \]
+    Для Momentum градиент берётся в $\theta_t$,
+    для Nesterov --- в $\theta_t^{\mathrm{look}}$.
 
-    \mlRemark\;
-    В методе Нестерова градиент вычисляется в точке, учитывающей предполагаемое
-    движение по накопленному импульсу.
+    \mlRemark\; При $\beta=0$ обе формулы переходят в обычный GD.
+    Термин «опережение» описывает \emph{место вычисления градиента},
+    а не предсказание точного положения минимума.
+\end{frame}
+
+\begin{frame}{AdaGrad: накопление квадратов градиентов}
+    \mlBody
+    \mlDefinition\; \textit{AdaGrad (адаптивный градиентный метод)}
+    хранит сумму квадратов предыдущих градиентов:
+    \[
+    \begin{aligned}
+        G_{t+1}&=G_t+g_t\odot g_t,\qquad G_0=0,\\
+        \theta_{t+1}&=\theta_t-\eta
+        \frac{g_t}{\sqrt{G_{t+1}}+\varepsilon}.
+    \end{aligned}
+    \]
+    Квадратный корень, деление и сложение с $\varepsilon>0$
+    выполняются по координатам.
+
+    \mlExample\; Если первый градиент $g_0=(2,1)^T$,
+    то $G_1=(4,1)^T$. При малом $\varepsilon$ масштабы шага
+    равны приблизительно $\eta/2$ и $\eta$.
+
+    \mlConsequence\; Для координаты $j$ эффективный шаг имеет масштаб
+    \[
+       \eta_{t,j}=\frac{\eta}{\sqrt{G_{t+1,j}}+\varepsilon}.
+    \]
+    Поскольку $G_{t,j}$ не убывает, этот масштаб может со временем
+    стать очень малым --- главный недостаток AdaGrad.
+\end{frame}
+
+\begin{frame}{RMSProp: не суммировать всю историю}
+    \mlBody
+    \mlIdea\; В AdaGrad квадрат градиента накапливается навсегда.
+    Заменим сумму \emph{экспоненциальным скользящим средним},
+    в котором давние градиенты постепенно забываются.
+
+    \mlDefinition\; \textit{RMSProp}:
+    \[
+    \begin{aligned}
+        s_{t+1}&=\rho s_t+(1-\rho)(g_t\odot g_t),
+        \qquad s_0=0,\\
+        \theta_{t+1}&=\theta_t-
+        \eta\frac{g_t}{\sqrt{s_{t+1}}+\varepsilon},
+        \qquad 0\le\rho<1.
+    \end{aligned}
+    \]
+    \mlRemark\; При постоянном масштабе градиентов $s_t$
+    стабилизируется, а не растёт без ограничения,
+    как сумма в AdaGrad. Поэтому масштаб шага может сохраняться и на поздних итерациях.
+\end{frame}
+
+
+\begin{frame}{Adam: инерция и адаптивный масштаб}
+\mlBody
+\mlIdea\; Momentum сглаживает направление градиента, RMSProp --- его покоординатный масштаб. \textit{Adam} объединяет эти идеи.
+
+При $g_t=\nabla L(\theta_t)$, $m_0=s_0=0$:
+\[
+ \begin{aligned}
+ m_{t+1}&=\beta_1m_t+(1-\beta_1)g_t,\\
+ s_{t+1}&=\beta_2s_t+(1-\beta_2)(g_t\odot g_t).
+ \end{aligned}
+\]
+Поправки на нулевую инициализацию:
+\[
+ \widehat m_{t+1}=\frac{m_{t+1}}{1-\beta_1^{t+1}},\qquad
+ \widehat s_{t+1}=\frac{s_{t+1}}{1-\beta_2^{t+1}}.
+\]
+\mlDefinition\; Шаг Adam ($\varepsilon>0$):
+\[
+ \boxed{\theta_{t+1}=\theta_t-\eta\frac{\widehat m_{t+1}}{\sqrt{\widehat s_{t+1}}+\varepsilon}}.
+\]
+\mlRemark\; Все операции с векторами, кроме сложения, выполняются покоординатно. Adam не гарантирует превосходства на любой задаче.
+\end{frame}
+
+\begin{frame}{Траектории методов на линиях уровня}
+    \mlBody
+    На одной функции и из одной стартовой точки методы
+    могут выбирать разные направления и длины шагов.
 
     \begin{center}
-        \safeimg[width=0.62\linewidth]{img/momentum_valley.pdf}
+        \slideimg[width=0.89\linewidth,height=4.73cm,keepaspectratio]
+        {img/optimizer_trajectories.pdf}
     \end{center}
+    \mlRemark\; Это учебная иллюстрация конкретного эксперимента,
+    а не доказательство, что один алгоритм всегда быстрее другого.
 \end{frame}
 
-\begin{frame}{AdaGrad и RMSProp}
-    Пусть $g_t=\nabla L(\theta_t)$, а $\odot$ обозначает покоординатное умножение.
-
-    \mlDefinition\; \textbf{AdaGrad}
-    \[
-        G_t=G_{t-1}+g_t\odot g_t,
-    \]
-    \[
-        \theta_{t+1}
-        =\theta_t-
-        \eta\frac{g_t}{\sqrt{G_t}+\varepsilon}.
-    \]
-
-    Эффективный размер шага автоматически уменьшается по координатам, где накоплены
-    большие значения градиента.
-
-    \mlDefinition\; \textbf{RMSProp}
-    \[
-        s_t=\rho s_{t-1}+(1-\rho)g_t\odot g_t,
-    \]
-    \[
-        \theta_{t+1}
-        =\theta_t-
-        \eta\frac{g_t}{\sqrt{s_t}+\varepsilon}.
-    \]
-
-    \mlRemark
-
-    В AdaGrad сумма квадратов градиентов монотонно растёт, поэтому шаг может стать
-    слишком малым. RMSProp заменяет полное накопление экспоненциальным скользящим средним.
+\begin{frame}{Сравнение оптимизаторов по функции потерь}
+\mlBody
+Для объективного сравнения задают одинаковые данные, начальную точку
+и критерий остановки; параметры методов при этом требуют подбора.
+\begin{center}
+    \slideimg[width=0.93\linewidth,height=4.60cm,keepaspectratio]{img/optimizer_loss.pdf}
+\end{center}
+\mlRemark\; На графике показана зависимость $L(\theta_t)$ от номера итерации
+для конкретных настроек. Ускорение на этой задаче не гарантирует
+превосходства метода на другой функции.
 \end{frame}
 
-\begin{frame}{Adam}
-    \mlDefinition
 
-    \textit{Adam} использует экспоненциальные средние первого и второго моментов градиента:
-    \[
-        m_t=\beta_1m_{t-1}+(1-\beta_1)g_t,
-    \]
-    \[
-        v_t=\beta_2v_{t-1}+(1-\beta_2)g_t\odot g_t.
-    \]
-
-    Для компенсации начальных значений $m_0=v_0=0$ применяются поправки
-    \[
-        \hat m_t=\frac{m_t}{1-\beta_1^t},
-        \qquad
-        \hat v_t=\frac{v_t}{1-\beta_2^t}.
-    \]
-
-    Итоговое обновление:
-    \[
-        \boxed{
-        \theta_{t+1}
-        =\theta_t-
-        \eta\frac{\hat m_t}{\sqrt{\hat v_t}+\varepsilon}
-        }.
-    \]
-
-    \mlRemark
-
-    Первый момент задаёт сглаженное направление движения, второй --- адаптивный
-    масштаб шага по отдельным координатам.
-\end{frame}
-
-\begin{frame}{Сравнение градиентных методов}
-    Для корректного сравнения оптимизаторы запускаются
-    \begin{itemize}
-        \item на одной функции потерь;
-        \item из одной стартовой точки;
-        \item при фиксированных гиперпараметрах каждого метода.
-    \end{itemize}
-
-    Сравниваются
-    \[
-        \text{GD},\quad
-        \text{Momentum},\quad
-        \text{Nesterov},\quad
-        \text{AdaGrad},\quad
-        \text{RMSProp},\quad
-        \text{Adam}.
-    \]
-
-    Основные характеристики:
-    \begin{itemize}
-        \item траектория параметров на линиях уровня;
-        \item скорость уменьшения $L(\theta_t)$;
-        \item число итераций до заданной точности;
-        \item устойчивость к различному масштабу координат.
-    \end{itemize}
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/optimizer_trajectories.pdf}
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/optimizer_loss.pdf}
-    \end{columns}
-
-    % Manim: animations/06_optimizers.mp4
-\end{frame}
-
-% ============================================================
 % Глава 4
-% ============================================================
+\chapterframe{4}{Решающие деревья и ансамбли}
 
-\chapterframe{4}{Решающие деревья и Gradient Boosting}
+\begin{frame}{Что меняется при переходе от линейной модели к дереву?}
+\mlBody
+\mlTask\; Построить правило, которое умеет выбирать разные ответы в разных областях пространства признаков.
 
-\begin{frame}{Decision Tree (решающее дерево)}
-    \mlDefinition
+Линейная модель использует одну формулу $f_\theta(x)$ для всей области. Дерево вместо этого последовательно проверяет условия на признаки:
+\[
+  x_j\le t\quad\text{или}\quad x_j>t.
+\]
+\mlDefinition\; \textit{Решающее дерево} (Decision Tree) --- модель из внутренних вершин с условиями и листьев с прогнозами.
 
-    Внутренняя вершина решающего дерева содержит предикат
-    \[
-        x_j\le t,
-    \]
-    где $j$ --- номер признака, $t$ --- порог.
+\mlExample\; Для стоимости жилья: «площадь $>50$?» --- затем «район центральный?» --- в достигнутом листе прогноз среднего значения цены.
 
-    Для множества объектов $S$ предикат определяет разбиение
-    \[
-        S_L(j,t)=\{(x_i,y_i)\in S:x_{ij}\le t\},
-    \]
-    \[
-        S_R(j,t)=\{(x_i,y_i)\in S:x_{ij}>t\}.
-    \]
-
-    Внутренние вершины задают последовательность условий, а листья содержат итоговое
-    предсказание модели.
-
-    \mlRemark
-
-    В отличие от линейных моделей, структура дерева сама является частью решения:
-    необходимо выбрать признаки, пороги и глубину разбиений.
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.94\linewidth]{img/tree_split.pdf}
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.94\linewidth]{img/decision_tree.pdf}
-    \end{columns}
+\mlRemark\; Сами признаки, пороги и структура дерева \emph{выбираются} по обучающей выборке. Это дискретная задача, не похожая на настройку коэффициентов прямой.
 \end{frame}
 
-\begin{frame}{Критерий разбиения}
-    Пусть $H(S)$ --- мера неоднородности ответов объектов, попавших в вершину.
+\begin{frame}{Один split: формальное разбиение выборки}
+\mlBody
+Пусть $S\subseteq D_{\mathrm{train}}$ --- объекты, попавшие в текущую вершину дерева.
 
-    \mlDefinition
+\mlDefinition\; Пара $(j,t)$ определяет два непересекающихся множества:
+\[
+ S_L(j,t)=\{(x_i,y_i)\in S:x_{ij}\le t\},
+\]
+\[
+ S_R(j,t)=\{(x_i,y_i)\in S:x_{ij}>t\}.
+\]
+Вместе они образуют $S=S_L\sqcup S_R$.
 
-    \textit{Качеством разбиения} $(j,t)$ назовём уменьшение неоднородности
-    \[
-        Q(S,j,t)
-        =H(S)
-        -\frac{|S_L|}{|S|}H(S_L)
-        -\frac{|S_R|}{|S|}H(S_R).
-    \]
+\mlRemark\; Для числовых признаков достаточно проверять пороги между соседними различными отсортированными значениями признака.
 
-    На каждом шаге выбирается
-    \[
-        \boxed{
-        (j^\ast,t^\ast)
-        \in
-        \operatorname*{arg\,max}_{j,t}Q(S,j,t)
-        }.
-    \]
-
-    \mlRemark
-
-    Это локальная задача оптимизации: алгоритм не ищет сразу оптимальное дерево целиком,
-    а выбирает наилучшее разбиение в текущей вершине.
-
-    \mlConsequence
-
-    Такое построение называется \textit{жадным}: каждый шаг оптимален относительно
-    текущей вершины, но не обязан давать глобально оптимальную структуру дерева.
-
-    \begin{center}
-        \safeimg[width=0.68\linewidth]{img/tree_candidates.pdf}
-    \end{center}
+\begin{center}
+\slideimg[width=0.89\linewidth,height=3.62cm,keepaspectratio]{img/tree_split.pdf}
+\end{center}
 \end{frame}
 
-\begin{frame}{Критерии для регрессии и классификации}
-    \small
-    \dblue{Регрессия}
+\begin{frame}{Что означает «хорошее разбиение»?}
+\mlBody
+Вершина считается однородной, если попавшие в неё ответы мало различаются.
+Обозначим через $H(S)$ \textit{неоднородность} ответов в $S$.
 
-    В качестве неоднородности можно использовать дисперсию ответов в вершине:
-    \[
-        H_{\mathrm{MSE}}(S)
-        =\frac1{|S|}
-        \sum_{(x_i,y_i)\in S}(y_i-\bar y_S)^2,
-    \]
-    где
-    \[
-        \bar y_S=\frac1{|S|}\sum_{(x_i,y_i)\in S}y_i.
-    \]
-    Предсказанием листа обычно является $\bar y_S$.
+\mlDefinition\; \textit{Уменьшение неоднородности} при split $(j,t)$:
+\[
+ \boxed{Q(S,j,t)=H(S)-\frac{|S_L|}{|S|}H(S_L)-\frac{|S_R|}{|S|}H(S_R)}.
+\]
+Вес каждого дочернего узла равен его доле объектов: больший узел сильнее влияет на критерий.
 
-    \dblue{Классификация}
-
-    Критерий Джини:
-    \[
-        G(S)=1-\sum_{k=1}^{K}p_k^2.
-    \]
-    Энтропия:
-    \[
-        H(S)=-\sum_{k=1}^{K}p_k\log p_k.
-    \]
-
-    Здесь $p_k$ --- доля объектов класса $k$ в вершине.
-
-    \mlRemark
-
-    Хороший split уменьшает неоднородность ответов в дочерних вершинах
-    по сравнению с исходной вершиной.
+\mlAlgorithm\; Выбрать допустимую пару
+\[
+ \boxed{(j^*,t^*)\in\operatorname*{arg\,max}_{j,t}Q(S,j,t)}.
+\]
+    \mlRemark\; Это локальный оптимум для одной вершины, а не для всего дерева.
+    Пустые дочерние множества не рассматриваются.
+    Если $H$ --- дисперсия или индекс Джини, то $Q\ge0$ для
+    допустимого разбиения; улучшение оценивается с учётом размеров узлов.
 \end{frame}
 
-\begin{frame}{Жадное построение дерева}
-    \mlStatement
+\begin{frame}{Какие критерии подходят для разных задач?}
+\mlBody
+\dblue{Регрессия: разброс числовых ответов}
+\[
+ \bar y_S=\frac1{|S|}\sum_{i\in I(S)}y_i,\qquad
+ H_{\mathrm{reg}}(S)=\frac1{|S|}\sum_{i\in I(S)}(y_i-\bar y_S)^2.
+\]
+Прогноз в листе при квадратичной ошибке --- средний ответ $\bar y_S$.
 
-    Полный перебор всех возможных структур дерева практически неосуществим, поэтому
-    дерево строится рекурсивно и жадно.
-
-    \begin{enumerate}
-        \item В текущую вершину приходит множество объектов $S$.
-        \item Перебираются допустимые признаки $j$ и пороги $t$.
-        \item Для каждого кандидата вычисляется $Q(S,j,t)$.
-        \item Выбирается локально лучшее разбиение $(j^\ast,t^\ast)$.
-        \item Процедура повторяется в дочерних вершинах.
-    \end{enumerate}
-
-    Рост дерева ограничивают, например,
-    \begin{itemize}
-        \item максимальной глубиной;
-        \item минимальным числом объектов в вершине;
-        \item минимальным улучшением критерия.
-    \end{itemize}
-
-    \mlRemark
-
-    Параметры дерева включают дискретный выбор признака и структуры, поэтому производная
-    по этим величинам в обычном смысле не определена. Gradient Descent непосредственно
-    к построению дерева не применяется.
-
-    % Manim: animations/07_decision_tree.mp4
-    \begin{center}
-        \href{run:animations/07_decision_tree.mp4}{%
-        \safeimg[width=0.58\linewidth]{img/07_decision_tree_poster.png}}
-    \end{center}
+\dblue{Классификация: доли классов}\quad $p_k(S)=\frac{\#\{i\in I(S):y_i=k\}}{|S|}$.
+\[
+ \text{Gini: }H_{\mathrm{Gini}}(S)=1-\sum_{k=1}^{K}p_k(S)^2,
+\]
+\[
+ \text{Entropy: }H_{\mathrm{ent}}(S)=-\sum_{k=1}^{K}p_k(S)\log p_k(S).
+\]
+\mlRemark\; Здесь $I(S)$ --- индексы объектов в вершине; по соглашению $0\log 0=0$. В чистой вершине обе меры равны нулю.
 \end{frame}
 
-\begin{frame}{Random Forest и Gradient Boosting}
-    \begin{columns}[T,onlytextwidth]
-        \column{0.49\textwidth}
-        \dblue{Random Forest (случайный лес)}
+\begin{frame}{Числовой пример критерия Джини}
+\mlBody
+\mlExample\; В корне находятся четыре объекта: два класса $0$ и два класса $1$.
+\[
+ H_{\mathrm{Gini}}(S)=1-\left(\tfrac24\right)^2-\left(\tfrac24\right)^2=\tfrac12.
+\]
+Предположим, порог разделяет их на \emph{чистые} группы: слева оба объекта класса $0$, справа оба класса $1$.
+\[
+ H(S_L)=H(S_R)=0,\qquad Q(S,j,t)=\tfrac12-0=\boxed{\tfrac12}.
+\]
+Если же каждый дочерний узел снова содержит по одному объекту каждого класса, то
+\[
+ Q(S,j,t)=\tfrac12-\tfrac24\cdot\tfrac12-\tfrac24\cdot\tfrac12=0.
+\]
+    \mlConsequence\; Хороший split делает ответы дочерних вершин более однородными.
+    Например, если в одном дочернем узле доли классов $3/4$ и $1/4$,
+    то $H_{\mathrm{Gini}}=1-(3/4)^2-(1/4)^2=3/8<1/2$.
 
-        Строится множество деревьев
-        \[
-            h_1,\ldots,h_M,
-        \]
-        после чего их ответы агрегируются усреднением или голосованием.
-
-        Для уменьшения корреляции между деревьями используются
-        \begin{itemize}
-            \item bootstrap-выборки объектов;
-            \item случайные подмножества признаков при выборе split'а.
-        \end{itemize}
-
-        \column{0.49\textwidth}
-        \dblue{Gradient Boosting (градиентный бустинг)}
-
-        Строится последовательность композиций
-        \[
-            F_0\to F_1\to\cdots\to F_M.
-        \]
-        Каждое следующее дерево зависит от уже построенного ансамбля и исправляет его
-        текущую ошибку.
-    \end{columns}
-
-    \mlRemark
-
-    Random Forest строит разнообразные деревья преимущественно независимо;
-    Gradient Boosting строит деревья последовательно.
-
-    \begin{center}
-        \safeimg[width=0.72\linewidth]{img/rf_vs_boosting.pdf}
-    \end{center}
 \end{frame}
 
-\begin{frame}{Gradient Boosting (градиентный бустинг)}
-    Пусть после $m-1$ шагов построена композиция $F_{m-1}$.
-
-    \mlDefinition
-
-    Следующая модель добавляется по правилу
-    \[
-        \boxed{
-        F_m(x)=F_{m-1}(x)+\eta h_m(x)
-        },
-    \]
-    где $h_m$ --- новое дерево, а $\eta>0$ --- шаг бустинга.
-
-    Для дифференцируемой функции потерь вводятся \textit{псевдоостатки}
-    \[
-        \boxed{
-        r_i^{(m)}
-        =-
-        \left.
-        \frac{\partial\ell(y_i,F(x_i))}{\partial F(x_i)}
-        \right|_{F=F_{m-1}}
-        }.
-    \]
-
-    Новое дерево обучается приближать значения $r_i^{(m)}$ на обучающих объектах.
-
-    \mlRemark
-
-    Величина $\eta$ играет роль шага: малое значение делает обновления более осторожными,
-    но требует большего числа деревьев.
+\begin{frame}{Как выбирается порог среди кандидатов?}
+\mlBody
+Для фиксированного признака алгоритм сравнивает возможные пороги $t$ и выбирает тот, который сильнее уменьшает неоднородность $H(S)$.
+\begin{center}
+\slideimg[width=0.97\linewidth,height=4.80cm,keepaspectratio]{img/tree_candidates.pdf}
+\end{center}
+\mlRemark\; На рисунке показан один иллюстративный набор данных. Результат сравнения зависит от выбранного критерия и состава вершины.
 \end{frame}
 
-\begin{frame}{Gradient Boosting как спуск в пространстве функций}
-    Для квадратичной функции потерь
-    \[
-        \ell(y,F)=(y-F)^2
-    \]
-    имеем
-    \[
-        -\frac{\partial\ell(y,F)}{\partial F}
-        =2(y-F).
-    \]
-    Следовательно, отрицательный градиент пропорционален обычному остатку
-    \[
-        y_i-F_{m-1}(x_i).
-    \]
-
-    \mlConsequence
-
-    При MSE очередное дерево обучается приближать ошибки текущего ансамбля.
-
-    \mlRemark
-
-    В Gradient Descent изменяется конечномерный вектор параметров $\theta$;
-    в Gradient Boosting последовательно изменяется функция $F$ посредством добавления
-    новых базовых моделей $h_m$.
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/boosting_steps.pdf}
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/boosting_loss.pdf}
-    \end{columns}
-
-    % Manim: animations/08_gradient_boosting.mp4
+\begin{frame}{Как дерево строится: жадный алгоритм}
+\mlBody
+\mlAlgorithm
+\begin{enumerate}
+\item Положить $S=D_{\mathrm{train}}$ в корень.
+\item В вершине перебрать допустимые признаки $j$ и пороги $t$.
+\item Вычислить $Q(S,j,t)$, выбрать максимальное улучшение.
+\item Разделить объекты на $S_L$ и $S_R$ и повторить рекурсивно.
+\item Остановиться при малом числе объектов, предельной глубине или отсутствии улучшения.
+\end{enumerate}
+\mlRemark\; В листьях возвращается среднее $y$ для регрессии или наиболее частый класс для классификации.
+\mlConsequence\; Глубина дерева контролирует сложность модели:
+слишком глубокое дерево может подогнать и шум обучающей выборки.
 \end{frame}
 
-% ============================================================
+\begin{frame}{Структура обученного дерева}
+\mlBody
+Внутренняя вершина хранит условие $x_j\le t$, а лист --- прогноз.
+Для нового объекта последовательно проверяем условия от корня до листа.
+\begin{center}
+\slideimg[width=0.96\linewidth,height=4.67cm,keepaspectratio]{img/decision_tree.pdf}
+\end{center}
+\mlRemark\; В отличие от линейной регрессии дерево задаёт
+кусочно-постоянную функцию на областях пространства признаков.
+\end{frame}
+
+
+\begin{frame}{Random Forest и Gradient Boosting: разная логика}
+\mlBody
+\mlStatement\; \textit{Random Forest} усредняет разнообразные деревья, обученные на bootstrap-выборках со случайным выбором признаков для split. В \textit{Gradient Boosting} каждое дерево исправляет ошибки уже построенной композиции.
+
+\[
+ \text{Forest: }F(x)=\frac1M\sum_{m=1}^Mh_m(x),
+\]
+\[
+ \text{Boosting: }F_0\longrightarrow F_1\longrightarrow\cdots\longrightarrow F_M.
+\]
+\begin{center}
+\slideimg[width=0.97\linewidth,height=2.12cm,keepaspectratio]{img/rf_vs_boosting.pdf}
+\end{center}
+\mlRemark\; Лес может усреднять прогнозы или голосовать классами.
+В бустинге очередная модель зависит от ошибок предыдущей композиции.
+\end{frame}
+
+
+
+
+\begin{frame}{Gradient Boosting: последовательное исправление ошибок}
+\mlBody
+\mlDefinition\; \textit{Градиентный бустинг} строит последовательность функций
+\[
+ \boxed{F_m(x)=F_{m-1}(x)+\eta h_m(x)},\qquad \eta>0,
+\]
+где $F_{m-1}$ --- текущий ансамбль, $h_m$ --- новое дерево, $\eta$ --- размер добавляемой поправки.
+
+\mlRemark\; Здесь аргумент функции потерь --- сама модель $F$, а не вектор $\theta$ из главы 3.
+
+\mlTask\; Пусть на выборке оптимизируется
+\[
+ L(F)=\frac1n\sum_{i=1}^n\ell\bigl(y_i,F(x_i)\bigr).
+\]
+Для дифференцируемой потери на шаге $m$ определяют \textit{псевдоостатки}
+\[
+ \boxed{r_i^{(m)}=-\left.\frac{\partial\ell(y_i,z)}{\partial z}\right|_{z=F_{m-1}(x_i)}}.
+\]
+Новое дерево $h_m$ обучают \emph{приближать} $r_i^{(m)}$ на обучающих объектах.
+\end{frame}
+
+\begin{frame}{При MSE бустинг приближает обычные остатки}
+\mlBody
+Возьмём квадратичную потерю (как в главе 2):
+\[
+ \ell(y,z)=(y-z)^2,\qquad
+ -\frac{\partial\ell(y,z)}{\partial z}=2(y-z).
+\]
+Следовательно,
+\[
+ r_i^{(m)}=2\bigl(y_i-F_{m-1}(x_i)\bigr).
+\]
+Множитель $2$ можно учесть при подборе масштаба поправки. Содержательно дерево учится предсказывать остатки текущей модели.
+
+\mlExample\; Если $y_i=10$, а $F_{m-1}(x_i)=7$, то остаток $3$; новое дерево должно предложить положительную поправку.
+
+\mlConsequence\; Обычный GD меняет вектор $\theta$ по антиградиенту; Gradient Boosting строит новое направление в пространстве прогнозов посредством дерева $h_m$.
+\end{frame}
+
+\begin{frame}{Gradient Boosting: последовательность поправок}
+\mlBody
+\mlIdea\; Начальная функция $F_0$ постепенно улучшается добавлением
+новых деревьев $h_m$:
+\[
+  F_m(x)=F_0(x)+\eta\sum_{k=1}^{m}h_k(x).
+\]
+\begin{center}
+\slideimg[width=0.98\linewidth,height=4.5cm,keepaspectratio]{img/boosting_steps.pdf}
+\end{center}
+\mlRemark\; Каждая поправка обучается на псевдоостатках предыдущей модели.
+\end{frame}
+
+\begin{frame}{Gradient Boosting: как меняется ошибка}
+\mlBody
+Качество ансамбля на обучающей выборке оценивают той же функцией
+эмпирического риска:
+\[
+ L(F_m)=\frac1n\sum_{i=1}^{n}\ell\bigl(y_i,F_m(x_i)\bigr).
+\]
+\begin{center}
+\slideimg[width=0.91\linewidth,height=4.28cm,keepaspectratio]{img/boosting_loss.pdf}
+\end{center}
+\mlRemark\; График иллюстрирует один эксперимент.
+Убывание ошибки на каждой итерации не гарантировано
+для произвольного шага и структуры деревьев.
+\end{frame}
+
+
 % Глава 5
-% ============================================================
+\chapterframe{5}{Нейронные сети}
 
-\chapterframe{5}{Дополнительные методы}
+\begin{frame}{От линейной модели к искусственному нейрону}
+\mlBody
+В главе 2 предсказание имело вид $w^Tx+b$. \textit{Искусственный нейрон} добавляет к этой величине нелинейное преобразование:
+\[
+ \boxed{z=w^Tx+b,\qquad a=\varphi(z)}.
+\]
+\mlDefinition\; $w$ --- веса признаков, $b$ --- смещение (bias), $\varphi$ --- \textit{функция активации}.
 
-\begin{frame}{Principal Component Analysis (метод главных компонент)}
-    Пусть строки матрицы $X$ содержат центрированные объекты, а
-    \[
-        C=\frac1N X^TX
-    \]
-    --- ковариационная матрица.
+\mlExample\; $x=(2,1)^T$, $w=(0.5,-1)^T$, $b=0.5$:
+\[
+ z=0.5\cdot2-1\cdot1+0.5=0.5.
+\]
+При $\varphi(z)=\max(0,z)$ получаем $a=0.5$.
 
-    Для единичного направления $w$ проекция объекта $x$ равна $w^Tx$, а дисперсия
-    проекций определяется величиной $w^TCw$.
-
-    \mlDefinition
-
-    Первая главная компонента задаётся задачей
-    \[
-        \boxed{
-        \max_{\|w\|=1}w^TCw
-        }.
-    \]
-
-    \mlStatement
-
-    Решением является собственный вектор матрицы $C$, соответствующий наибольшему
-    собственному значению.
-
-    \mlRemark
-
-    PCA выбирает ортогональные направления максимальной дисперсии и позволяет оставить
-    первые компоненты, отбросив направления с относительно малой вариативностью.
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.94\linewidth]{img/pca.pdf}
-        \column{0.50\textwidth}
-        \centering
-        % Manim: animations/09_pca.mp4
-        \safeanimation[width=0.94\linewidth]{img/09_pca_poster.png}{animations/09_pca.mp4}
-    \end{columns}
+\mlRemark\; Веса и смещения будут обучаемыми параметрами;
+вектор всех параметров по-прежнему обозначается $\theta$.
+По правилу цепочки для дифференцируемой $\varphi$:
+\[
+   \nabla_w a=\varphi'(z)x,\qquad \frac{\partial a}{\partial b}=\varphi'(z).
+\]
+Так простая модель уже требует производных для настройки своих весов.
 \end{frame}
 
-\begin{frame}{Monte Carlo (метод Монте-Карло)}
-    Рассмотрим интеграл
-    \[
-        I=\int_a^b f(x)\,dx.
-    \]
-    Если $X\sim U(a,b)$, то
-    \[
-        \mathbb E[f(X)]
-        =\frac{1}{b-a}\int_a^b f(x)\,dx,
-    \]
-    поэтому
-    \[
-        I=(b-a)\mathbb E[f(X)].
-    \]
+\begin{frame}{Почему нейрону нужна нелинейная активация?}
+\mlBody
+Композиция двух аффинных преобразований остаётся аффинной:
+\[
+ z_1=W_1x+b_1,\qquad z_2=W_2z_1+b_2,
+\]
+\[
+ z_2=(W_2W_1)x+(W_2b_1+b_2).
+\]
+Без активаций несколько слоёв эквивалентны одному.
 
-    \mlDefinition
-
-    Для независимых $X_1,\ldots,X_N\sim U(a,b)$ оценка Монте-Карло имеет вид
-    \[
-        \boxed{
-        \hat I_N=
-        \frac{b-a}{N}\sum_{i=1}^{N}f(X_i)
-        }.
-    \]
-
-    \mlRemark
-
-    В основе метода лежит замена математического ожидания выборочным средним.
-    При увеличении $N$ оценка стабилизируется в соответствии с законом больших чисел.
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.94\linewidth]{img/monte_carlo.pdf}
-        \column{0.50\textwidth}
-        \centering
-        % Manim: animations/10_monte_carlo.mp4
-        \safeanimation[width=0.94\linewidth]{img/10_monte_carlo_poster.png}{animations/10_monte_carlo.mp4}
-    \end{columns}
+\mlDefinition\; Примеры активаций:
+\[
+ \operatorname{ReLU}(z)=\max(0,z),\qquad
+ \sigma(z)=\frac1{1+e^{-z}},
+\]
+\[
+ \tanh(z)=\frac{e^z-e^{-z}}{e^z+e^{-z}}.
+\]
+\mlConsequence\; Нелинейности позволяют сети выражать зависимости,
+которые нельзя представить одной линейной моделью исходных признаков.
+\mlRemark\; Для сигмоиды $\sigma'(z)=\sigma(z)(1-\sigma(z))$;
+для ReLU производная равна $0$ при $z<0$ и $1$ при $z>0$
+(в нуле обычная производная не существует).
 \end{frame}
 
-\begin{frame}{Ant Colony Optimization (муравьиный алгоритм)}
-    Рассмотрим граф, в котором из вершины $i$ допустимы переходы в вершины $j\in A_i$.
+\begin{frame}{Многослойная сеть: последовательность функций}
+\mlBody
+\mlDefinition\; \textit{Multilayer Perceptron} (MLP) --- композиция слоёв, каждый из которых применяет линейное преобразование и нелинейность.
 
-    \mlDefinition
+Обозначим вход $a^{(0)}=x$. Для слоя $\ell=1,\ldots,L$:
+\[
+ \boxed{z^{(\ell)}=W^{(\ell)}a^{(\ell-1)}+b^{(\ell)}},
+\]
+\[
+ \boxed{a^{(\ell)}=\varphi_\ell(z^{(\ell)})}.
+\]
+Размеры: $W^{(\ell)}\in\mathbb R^{d_\ell\times d_{\ell-1}}$,
+$b^{(\ell)}\in\mathbb R^{d_\ell}$.
 
-    Вероятность перехода по ребру $(i,j)$ задаётся
-    \[
-        P_{ij}
-        =
-        \frac{\tau_{ij}^{\alpha}\eta_{ij}^{\beta}}
-        {\sum\limits_{k\in A_i}\tau_{ik}^{\alpha}\eta_{ik}^{\beta}},
-    \]
-    где $\tau_{ij}$ --- накопленный феромон, $\eta_{ij}$ --- локальная привлекательность
-    перехода, а $\alpha,\beta$ задают их относительное влияние.
-
-    После итерации феромон обновляется:
-    \[
-        \boxed{
-        \tau_{ij}\leftarrow
-        (1-\rho)\tau_{ij}+\Delta\tau_{ij}
-        }.
-    \]
-
-    \mlRemark
-
-    Испарение $(1-\rho)\tau_{ij}$ препятствует бесконечному накоплению старой информации,
-    а $\Delta\tau_{ij}$ усиливает рёбра, участвовавшие в более качественных решениях.
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.33\textwidth}
-        \centering
-        \safeimg[width=0.94\linewidth]{img/ant_colony_early.pdf}
-        \column{0.33\textwidth}
-        \centering
-        \safeimg[width=0.94\linewidth]{img/ant_colony_late.pdf}
-        \column{0.33\textwidth}
-        \centering
-        % Manim: animations/11_ant_colony.mp4
-        \safeanimation[width=0.94\linewidth]{img/11_ant_colony_poster.png}{animations/11_ant_colony.mp4}
-    \end{columns}
+\mlRemark\; Все $W^{(\ell)}$ и $b^{(\ell)}$ составляют один вектор
+параметров $\theta$. Например, для двух слоёв:
+\[
+ f_\theta(x)=\varphi_2\!\left(W^{(2)}
+ \varphi_1(W^{(1)}x+b^{(1)})+b^{(2)}\right).
+\]
+Выход $f_\theta(x)$ --- результат последнего слоя.
 \end{frame}
 
-% ============================================================
+\begin{frame}{Пример: задача XOR и роль скрытого слоя}
+\mlBody
+Пусть $x_1,x_2\in\{0,1\}$. Требуется получить $y=1$, если входы различны, и $y=0$, если совпадают.
+
+\[
+ \begin{array}{c|cccc}
+ (x_1,x_2)&(0,0)&(0,1)&(1,0)&(1,1)\\\hline
+ y&0&1&1&0
+ \end{array}
+\]
+\mlStatement\; Эти четыре точки нельзя разделить одной прямой по классам.
+
+\mlExample\; Для ReLU можно взять два скрытых выхода
+\[
+ h_1=\operatorname{ReLU}(x_1+x_2),\quad
+ h_2=\operatorname{ReLU}(x_1+x_2-1),
+\]
+\[
+ \boxed{f(x)=h_1-2h_2}.
+\]
+Проверка: при сумме входов $0,1,2$ результат соответственно $0,1,0$.
+
+\mlConsequence\; Даже небольшая нелинейная сеть может решить задачу, недоступную одной линейной границе.
+\end{frame}
+
+\begin{frame}{Пример архитектуры: распознавание цифр}
+\mlBody
+Изображение $28\times28$ в оттенках серого представляют вектором $x\in\mathbb R^{784}$ (например, яркости от $0$ до $1$).
+
+Возможная MLP-архитектура:
+\[
+ \boxed{784\;\longrightarrow\;128\;\longrightarrow\;64\;\longrightarrow\;10}.
+\]
+\mlDefinition\; $784$ --- размер входа, $128$ и $64$ --- числа нейронов скрытых слоёв, $10$ --- числа выходных оценок классов.
+
+\mlExample\; Количество обучаемых весов и смещений:
+\[
+ (784\cdot128+128)+(128\cdot64+64)+(64\cdot10+10)
+ =109\,386.
+\]
+\mlRemark\; Это лишь пример архитектуры из исходного материала по нейросетям, а не требование для распознавания цифр. Большая сеть не гарантирует лучшего качества.
+\end{frame}
+
+\begin{frame}{Выход сети и функция потерь}
+\mlBody
+Тип выходного слоя выбирают в соответствии с задачей.
+\begin{itemize}
+\item \textit{Регрессия:} одно число $\hat y=f_\theta(x)$; можно использовать MSE из главы 2.
+\item \textit{Бинарная классификация:} вероятность $p=\sigma(z)$ и BCE.
+\item \textit{Многоклассовая классификация:} $K$ оценок $z_1,\ldots,z_K$ переводятся в вероятности функцией softmax.
+\end{itemize}
+\mlDefinition\; Для $k=1,\ldots,K$:
+\[
+ \boxed{p_k=\frac{e^{z_k}}{\sum_{j=1}^{K}e^{z_j}}},
+ \qquad \sum_{k=1}^Kp_k=1.
+\]
+Для правильного класса $y\in\{1,\ldots,K\}$ кросс-энтропийная потеря равна
+\[
+ \ell(y,p)=-\log p_y
+ =-z_y+\log\Bigl(\sum_{j=1}^{K}e^{z_j}\Bigr).
+\]
+\mlRemark\; Вновь сохраняется схема: предсказание $\to$ потеря $\to$ минимизация эмпирического риска.
+\end{frame}
+
+\begin{frame}{Обучение сети: тот же Gradient Descent}
+\mlBody
+Обозначим $\theta$ совокупность всех весов и смещений, а $L(\theta)$ --- среднюю потерю на обучающей выборке.
+\[
+ \hat\theta\in\operatorname*{arg\,min}_{\theta}L(\theta).
+\]
+\mlAlgorithm\; Одна итерация обучения:
+\begin{enumerate}
+\item Прямой проход (forward pass): получить $f_{\theta_t}(x_i)$.
+\item Посчитать ошибку $\ell(y_i,f_{\theta_t}(x_i))$.
+\item Обратный проход (backpropagation): получить $g_t\approx\nabla L(\theta_t)$.
+\item Обновить веса, например, $\theta_{t+1}=\theta_t-\eta g_t$ (GD или Adam).
+\end{enumerate}
+\mlDefinition\; \textit{Эпоха} (epoch) --- проход по всей обучающей
+выборке. На случайном mini-batch $B_t$ оптимизируют приближённую потерю
+\[
+    L_{B_t}(\theta)=\frac1{|B_t|}\sum_{i\in B_t}
+    \ell(y_i,f_\theta(x_i)).
+\]
+Это связывает обучение нейросети с Mini-batch SGD из главы 3.
+\end{frame}
+
+\begin{frame}{Backpropagation: применение правила цепочки}
+\mlBody
+\mlDefinition\; \textit{Backpropagation} (обратное распространение ошибки) --- эффективное вычисление градиентов по весам сети с помощью правила цепочки.
+
+\mlExample\; Для цепочки
+\[
+ h=\tanh(wx+b),\quad\hat y=vh+c,\quad\ell=(\hat y-y)^2
+\]
+вклад веса $w$ в ошибку составляет
+\[
+ \frac{\partial\ell}{\partial w}
+ =\underbrace{2(\hat y-y)}_{\partial\ell/\partial\hat y}
+ \cdot\underbrace{v}_{\partial\hat y/\partial h}
+ \cdot\underbrace{(1-h^2)}_{\partial h/\partial(wx+b)}
+ \cdot\underbrace{x}_{\partial(wx+b)/\partial w}.
+\]
+\mlConsequence\; Производные передаются от выхода к ранним слоям; промежуточные вычисления переиспользуются.
+
+\mlRemark\; Backpropagation \emph{вычисляет} градиент, а оптимизатор \emph{обновляет} параметры по нему.
+\end{frame}
+
+\begin{frame}{Backpropagation: производные целого слоя}
+\mlBody
+Для многослойной сети введём \textit{ошибку слоя}
+$\delta^{(\ell)}=\partial\ell/\partial z^{(\ell)}$.
+Пусть $\odot$ обозначает покоординатное произведение.
+
+\mlStatement\; Если активации применяются покоординатно, то правило цепочки даёт
+\[
+ \boxed{\delta^{(\ell)}=
+ \bigl(W^{(\ell+1)}\bigr)^T\delta^{(\ell+1)}
+ \odot \varphi_\ell'\bigl(z^{(\ell)}\bigr)}.
+\]
+Из $z^{(\ell)}=W^{(\ell)}a^{(\ell-1)}+b^{(\ell)}$ следует
+\[
+ \boxed{\frac{\partial\ell}{\partial W^{(\ell)}}
+ =\delta^{(\ell)}\bigl(a^{(\ell-1)}\bigr)^T},
+ \qquad
+ \frac{\partial\ell}{\partial b^{(\ell)}}=\delta^{(\ell)}.
+\]
+\mlRemark\; Так градиенты вычисляются от выхода сети ко входу;
+их усредняют по mini-batch и передают оптимизатору из главы 3.
+\end{frame}
+
+
+\begin{frame}{Почему в глубоких сетях затухает градиент?}
+\mlBody
+\mlDefinition\; \textit{Затухание градиента} (vanishing gradient) --- ситуация, когда производные ошибки по параметрам ранних слоёв становятся очень малы.
+
+\mlIdea\; При многократном применении правила цепочки возникает произведение производных последующих слоёв:
+\[
+ \frac{\partial\ell}{\partial h_1}
+ =\frac{\partial\ell}{\partial h_L}
+ \prod_{j=2}^{L}\frac{\partial h_j}{\partial h_{j-1}}
+ \qquad\text{(для скалярной цепочки)}.
+\]
+Если множители по модулю меньше $1$, произведение может быстро уменьшаться.
+Например, $0.5^{10}\approx0.001$ --- за десять слоёв масштаб градиента
+уменьшился почти в тысячу раз.
+
+\mlRemark\; В векторной сети здесь участвуют матрицы Якоби. Не всякая глубокая сеть страдает от затухания градиента, но эффект существенно осложняет обучение.
+\end{frame}
+
+\begin{frame}{ResNet: остаточные связи и путь для градиента}
+\mlBody
+\mlDefinition\; \textit{Остаточный блок} (residual block) вычисляет
+\[
+ \boxed{h_{\ell+1}=h_\ell+F_\ell(h_\ell)},
+\]
+где $F_\ell$ --- несколько обучаемых преобразований.
+
+В скалярном случае производная по входу блока:
+\[
+ \frac{dh_{\ell+1}}{dh_\ell}=1+F_\ell'(h_\ell).
+\]
+Слагаемое $1$ соответствует обходному (shortcut) пути; оно помогает передавать информацию и градиент через блок.
+
+\mlRemark\; Идея ResNet помогает обучать глубокие сети, но сама по себе не гарантирует отсутствие любых проблем оптимизации.
+\end{frame}
+
+\begin{frame}{CNN: локальные фильтры и общие веса}
+\mlBody
+\mlDefinition\; \textit{Convolutional Neural Network} (свёрточная сеть, CNN) использует одни и те же обучаемые фильтры для обработки локальных участков входа.
+
+Для входной матрицы пикселей $A$ и фильтра $K\in\mathbb R^{r\times r}$ одно выходное значение (без смещения) имеет вид
+\[
+ \boxed{B_{u,v}=\sum_{i=0}^{r-1}\sum_{j=0}^{r-1}K_{ij}A_{u+i,v+j}}.
+\]
+\mlRemark\; В ML такая операция обычно реализуется как
+\emph{кросс-корреляция} (без переворота ядра), хотя слой называют свёрточным.
+Для входа $H\times W$ без дополнения и при шаге $1$
+выход имеет размер $(H-r+1)\times(W-r+1)$;
+один фильтр использует всего $r^2$ общих весов.
+
+\mlExample\; Фильтр $K=\begin{psmallmatrix}1&0&-1\\1&0&-1\\1&0&-1\end{psmallmatrix}$ выявляет различие между левой и правой частями участка изображения.
+\end{frame}
+
+\begin{frame}{Как CNN получает итоговый ответ}
+\mlBody
+\mlDefinition\; \textit{Карта признака} (feature map) --- значения отклика фильтра во всех доступных положениях. Несколько фильтров дают несколько карт.
+
+Обычно вслед за фильтрами применяют ReLU, а размер карт иногда уменьшают с помощью \textit{pooling}.
+
+\mlExample\; Max pooling по области $2\times2$:
+\[
+ \begin{pmatrix}1&3\\0&2\end{pmatrix}
+ \longmapsto \max\{1,3,0,2\}=3.
+\]
+\mlConsequence\; Слои CNN постепенно формируют признаки от локальных штрихов к более сложным структурам, а последний классификационный слой (например, с softmax) выдаёт распределение по классам.
+
+\mlRemark\; Фильтры и выходные слои обучаются совместно методом backpropagation и оптимизатором из главы 3.
+\end{frame}
+
+
 % Глава 6
-% ============================================================
+\chapterframe{6}{Дополнительные методы}
 
-\chapterframe{6}{Практическая часть}
+\begin{frame}{PCA: зачем уменьшать размерность?}
+\mlBody
+\mlTask\; Заменить $d$ исходных признаков меньшим числом признаков, сохранив как можно больше изменчивости данных.
 
-\begin{frame}{Программная реализация}
-    Практическая часть реализуется на языке Python.
+\mlDefinition\; \textit{Principal Component Analysis} (PCA, метод главных компонент) выбирает ортогональные направления с наибольшей дисперсией проекций.
 
-    \begin{itemize}
-        \item \texttt{NumPy} --- матричные и векторные вычисления;
-        \item \texttt{Matplotlib} --- построение статических графиков;
-        \item \texttt{Manim} --- математические анимации;
-        \item \texttt{scikit-learn} --- дополнительная проверка полученных результатов.
-    \end{itemize}
+Для начала данные центрируют: $\bar x=\frac1n\sum_{i=1}^nx_i$, $x_i^{\mathrm c}=x_i-\bar x$.
 
-    \mlStatement
+\mlExample\; Если данные лежат около диагональной прямой на плоскости, то вместо $(x_1,x_2)$ часто достаточно одной координаты вдоль этой прямой.
 
-    Основные алгоритмы реализуются самостоятельно, чтобы контролировать
-    \begin{itemize}
-        \item вычисление градиентов и обновление параметров;
-        \item выбор split'ов решающего дерева;
-        \item построение последовательности деревьев в Gradient Boosting.
-    \end{itemize}
-
-    Для сравнения методов фиксируются исходные данные, стартовые точки и параметры
-    эксперимента.
-
-    \mlRemark
-
-    Такой подход позволяет сопоставлять не только итоговые значения loss, но и сами
-    траектории и промежуточные состояния алгоритмов.
-
-    \vspace{0.25cm}
-    \centering
-    \texttt{PLACEHOLDER: ссылка на репозиторий}
+\mlRemark\; PCA --- метод \emph{без учителя}: целевые значения $y_i$
+для поиска направлений не используются. Алгоритм ищет структуру
+самих $x_i$, а не зависимость $y$ от $x$.
 \end{frame}
 
-\begin{frame}{Эксперимент: Linear Regression}
-    Рассматривается синтетическая выборка одного признака и модель
-    \[
-        \hat y=wx+b.
-    \]
+\begin{frame}{PCA: задача максимальной дисперсии}
+\mlBody
+Пусть $X_{\mathrm c}\in\mathbb R^{n\times d}$ --- матрица центрированных признаков. Положим
+\[
+ C=\frac1nX_{\mathrm c}^TX_{\mathrm c}.
+\]
+Для единичного направления $w$ проекция $i$-го объекта равна $z_i=w^Tx_i^{\mathrm c}$, а её эмпирическая дисперсия
+\[
+ \frac1n\sum_{i=1}^nz_i^2=w^TCw.
+\]
+\mlDefinition\; Первая главная компонента --- решение задачи
+\[
+ \boxed{w_1\in\operatorname*{arg\,max}_{\|w\|_2=1}w^TCw}.
+\]
+\mlStatement\; Максимум достигается на собственном векторе $C$, отвечающем наибольшему собственному значению.
 
-    Функция потерь:
-    \[
-        L(w,b)=
-        \frac1n\sum_{i=1}^{n}(y_i-wx_i-b)^2.
-    \]
-
-    В эксперименте фиксируются
-    \begin{itemize}
-        \item поверхность и линии уровня $L(w,b)$;
-        \item начальная точка $(w_0,b_0)$;
-        \item последовательность параметров $(w_t,b_t)$;
-        \item изменение прямой $wx+b$ в процессе оптимизации.
-    \end{itemize}
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/linear_regression.pdf}
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/mse_contours.pdf}
-    \end{columns}
-
-    % Manim: animations/02_linear_regression_loss.mp4
+\mlRemark\; Следующие компоненты выбирают ортогонально предыдущим.
+Если $W_k=(w_1,\ldots,w_k)\in\mathbb R^{d\times k}$,
+то новые признаки всех объектов равны
+\[
+ Z=X_{\mathrm c}W_k\in\mathbb R^{n\times k},\qquad k<d.
+\]
+Так получается уменьшение размерности с $d$ до $k$.
 \end{frame}
 
-\begin{frame}{Эксперимент: сравнение оптимизаторов}
-    На одной двумерной функции из одной начальной точки запускаются
-    \[
-        \text{GD},\quad
-        \text{Momentum},\quad
-        \text{Nesterov},\quad
-        \text{AdaGrad},\quad
-        \text{RMSProp},\quad
-        \text{Adam}.
-    \]
-
-    Для каждого метода сохраняются
-    \begin{itemize}
-        \item последовательность параметров $\theta_t$;
-        \item значения $L(\theta_t)$;
-        \item число итераций;
-        \item расстояние до известной точки минимума.
-    \end{itemize}
-
-    \mlRemark
-
-    Сравнение траекторий показывает геометрическое различие методов, а график
-    $L(\theta_t)$ позволяет сравнить скорость уменьшения функции потерь.
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/optimizer_trajectories.pdf}
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/optimizer_loss.pdf}
-    \end{columns}
-
-    % Manim: animations/06_optimizers.mp4
+\begin{frame}{PCA: геометрическая иллюстрация}
+\mlBody
+Проекция на направление наибольшей дисперсии сохраняет основной разброс точек; проекция на перпендикулярное направление часто содержит мало информации.
+\begin{center}
+\slideimg[width=0.94\linewidth,height=4.75cm,keepaspectratio]{img/pca.pdf}
+\end{center}
+\mlRemark\; Максимальная дисперсия не обязательно равна максимальной информативности для \emph{конкретной} задачи классификации.
 \end{frame}
 
-\begin{frame}{Эксперимент: Decision Tree}
-    На небольшом двумерном наборе данных вручную воспроизводятся первые шаги
-    жадного построения дерева.
+\begin{frame}{Monte Carlo: интеграл как математическое ожидание}
+\mlBody
+\mlTask\; Приближённо найти $I=\int_a^bf(x)\,dx$.
 
-    Для текущей вершины $S$ вычисляются значения
-    \[
-        Q(S,j,t)
-    \]
-    для допустимых признаков и порогов, после чего выбирается
-    \[
-        (j^\ast,t^\ast)
-        \in\operatorname*{arg\,max}_{j,t}Q(S,j,t).
-    \]
-
-    В эксперименте сохраняются
-    \begin{itemize}
-        \item кандидатные split'ы;
-        \item значения критерия для каждого кандидата;
-        \item выбранная граница;
-        \item итоговая структура дерева.
-    \end{itemize}
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/tree_candidates.pdf}
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/decision_tree.pdf}
-    \end{columns}
-
-    % Manim: animations/07_decision_tree.mp4
+Пусть $U\sim\mathrm{Unif}[a,b]$, то есть плотность равна $1/(b-a)$ на $[a,b]$. Тогда
+\[
+ \mathbb E[f(U)]=\frac1{b-a}\int_a^bf(x)\,dx,
+ \qquad I=(b-a)\mathbb E[f(U)].
+\]
+\mlDefinition\; Метод Монте-Карло использует независимые точки $U_1,\ldots,U_N$:
+\[
+ \boxed{\widehat I_N=\frac{b-a}{N}\sum_{i=1}^Nf(U_i)}.
+\]
+\mlExample\; Для $\int_0^1x^2\,dx=1/3$ и точек $0.2,0.5,0.8$:
+\[
+ \widehat I_3=\frac{0.2^2+0.5^2+0.8^2}{3}=0.31.
+\]
+\mlStatement\; При существовании ожидания оценка несмещённая:
+$\mathbb E[\widehat I_N]=I$.
+С ростом $N$ случайные отклонения в среднем компенсируются.
 \end{frame}
 
-\begin{frame}{Эксперимент: Gradient Boosting}
-    Строится последовательность композиций
-    \[
-        F_0,F_1,\ldots,F_M,
-        \qquad
-        F_m=F_{m-1}+\eta h_m.
-    \]
+\begin{frame}{Monte Carlo: почему выборочное среднее работает?}
+\mlBody
+\mlStatement\; При $\mathbb E|f(U)|<\infty$ по закону больших чисел
+\[
+ \widehat I_N\longrightarrow I\quad\text{(при }N\to\infty\text{, почти наверное)}.
+\]
+Если дисперсия $\operatorname{Var}(f(U))=\sigma_f^2$ конечна, то
+\[
+ \operatorname{Var}(\widehat I_N)=\frac{(b-a)^2\sigma_f^2}{N},
+\]
+поэтому характерный масштаб случайной ошибки убывает как $1/\sqrt N$.
 
-    На каждом шаге сохраняются
-    \begin{itemize}
-        \item текущие предсказания $F_{m-1}(x_i)$;
-        \item residuals или pseudo-residuals $r_i^{(m)}$;
-        \item новое дерево $h_m$;
-        \item значение общей функции потерь.
-    \end{itemize}
+\mlExample\; Чтобы уменьшить типичный масштаб ошибки примерно в $10$ раз,
+при прочих равных понадобится около $100$ раз больше случайных точек.
 
-    \mlStatement
+\mlRemark\; Метод применим и к многомерным интегралам, однако высокая
+точность может потребовать много вычислений.
 
-    Основной наблюдаемый эффект --- последовательное уменьшение ошибки ансамбля за счёт
-    добавления моделей, приближающих антиградиент функции потерь.
-
-    \begin{columns}[T,onlytextwidth]
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/boosting_steps.pdf}
-        \column{0.50\textwidth}
-        \centering
-        \safeimg[width=0.95\linewidth]{img/boosting_loss.pdf}
-    \end{columns}
-
-    % Manim: animations/08_gradient_boosting.mp4
 \end{frame}
 
-% ============================================================
-% Итоги
-% ============================================================
+\begin{frame}{Monte Carlo: иллюстрация сходимости}
+\mlBody
+Слева показано случайное выборочное приближение интеграла, справа --- изменение ошибки при увеличении числа точек.
+\begin{center}
+\slideimg[width=0.98\linewidth,height=4.78cm,keepaspectratio]{img/monte_carlo.pdf}
+\end{center}
+\mlRemark\; Ошибка для случайной выборки не обязана уменьшаться на каждом шаге. Скорость $N^{-1/2}$ характеризует типичный статистический масштаб.
+\end{frame}
 
-\begin{frame}{Итоги}
-    \begin{enumerate}
-        \item Обучение параметрической модели формулируется как задача
-        \[
-            \hat\theta\in\arg\min_{\theta}L_D(\theta).
-        \]
+\begin{frame}{Ant Colony Optimization: вероятностный выбор маршрута}
+\mlBody
+\mlTask\; На взвешенном графе найти короткий маршрут, проходящий через все требуемые вершины (например, задача коммивояжёра).
 
-        \item Для гладких функций потерь естественно возникают функции нескольких
-        переменных, частные производные, градиент, линии уровня и численные методы
-        поиска минимума.
+\mlDefinition\; \textit{Ant Colony Optimization} (муравьиный алгоритм) --- стохастический метаэвристический метод: вероятность ребра зависит от накопленного феромона $\tau_{ij}>0$ и привлекательности $\nu_{ij}>0$.
+\[
+ \boxed{P_{ij}=\frac{\tau_{ij}^{\alpha}\nu_{ij}^{\beta}}{\sum_{k\in A_i}\tau_{ik}^{\alpha}\nu_{ik}^{\beta}}},
+ \qquad A_i\text{ --- допустимые продолжения}.
+\]
+\mlExample\; Для расстояний $d_{ij}>0$ берут $\nu_{ij}=1/d_{ij}$.
+Если два ребра имеют $\tau_1=2$, $\tau_2=1$,
+$\nu_1=\nu_2=1$, $\alpha=\beta=1$, то
+$P_1=\frac{2}{2+1}=\frac23$.
 
-        \item Linear Regression и Logistic Regression различаются видом модели и
-        функции потерь, но сохраняют общую постановку оптимизации.
+\mlRemark\; Параметры $\alpha,\beta\ge0$ управляют влиянием феромона и длины. В отличие от GD здесь оптимизируется дискретный маршрут, а не дифференцируемая функция параметров.
+\end{frame}
 
-        \item Decision Tree использует дискретное жадное построение структуры,
-        тогда как Gradient Boosting возвращает идею антиградиента на уровне
-        последовательного построения функции.
+\begin{frame}{Ant Colony Optimization: обновление феромона}
+\mlBody
+После построения маршрутов на итерации $t$ уровни феромона меняются:
+\[
+ \boxed{\tau_{ij}^{(t+1)}=(1-\rho_{\mathrm{evap}})\tau_{ij}^{(t)}+\Delta\tau_{ij}^{(t)}},
+\]
+где $0<\rho_{\mathrm{evap}}<1$ --- доля испарения, $\Delta\tau_{ij}^{(t)}$ --- добавка от найденных маршрутов.
 
-        \item PCA, Monte Carlo и Ant Colony Optimization иллюстрируют использование
-        линейной алгебры, вероятностных методов и метаэвристической оптимизации.
-    \end{enumerate}
+\mlExample\; В простой версии для построенных маршрутов
+$\pi_k$ длины $L_k$:
+\[
+ \Delta\tau_{ij}^{(t)}=
+ \sum_{k:\,(i,j)\in\pi_k}\frac{\kappa}{L_k}.
+\]
+Для маршрутов длины $4$ и $8$ вклад каждого ребра первого
+вдвое больше. Так короткие пути получают подкрепление.
 
-    \mlConsequence
+\mlConsequence\; Случайный поиск сочетает исследование новых маршрутов и усиление уже найденных удачных решений.
+\end{frame}
 
-    Математический анализ возникает в машинном обучении не как отдельный набор формул,
-    а как естественный язык постановки и решения задач обучения.
+\begin{frame}{Муравьиный алгоритм: как усиливается маршрут}
+\mlBody
+В начале поиск распределён по многим рёбрам; после нескольких итераций
+усиливаются пути, чаще встречающиеся в удачных маршрутах.
+\begin{columns}[T,onlytextwidth]
+ \column{0.50\textwidth}\centering
+ \slideimg[width=0.98\linewidth,height=4.18cm,keepaspectratio]{img/ant_colony_early.pdf}
+
+ \footnotesize Начальные значения феромона
+ \column{0.50\textwidth}\centering
+ \slideimg[width=0.98\linewidth,height=4.18cm,keepaspectratio]{img/ant_colony_late.pdf}
+
+ \footnotesize Усиленный найденный маршрут
+\end{columns}
+\mlRemark\; Из-за случайного выбора алгоритм не гарантирует
+глобально кратчайший путь за конечное число шагов.
+\end{frame}
+
+
+
+\begin{frame}{Итоги: единая математическая логика}
+\mlBody
+\begin{enumerate}
+\item \textit{Постановка:} данные $D_{\mathrm{train}}$, модель $f_\theta$, потеря $\ell$ и задача $\min_\theta L(\theta)$.
+\item \textit{Линейные модели:} MSE и BCE приводят к градиентам по параметрам.
+\item \textit{Оптимизация:} GD и его модификации используют локальную информацию о $L(\theta)$.
+\item \textit{Деревья и ансамбли:} дискретные разбиения и функциональная идея антиградиента в бустинге.
+\item \textit{Нейросети:} композиции функций, правило цепочки и обратное распространение градиента.
+\item \textit{Другие методы:} PCA использует дисперсию, Monte Carlo --- математическое ожидание, ACO --- вероятностный поиск.
+\end{enumerate}
+\mlConsequence\; Математический анализ связывает построение моделей и методы их обучения: от производной функции нескольких переменных до цепочки производных в нейросети.
 \end{frame}
 
 \begin{frame}{Основные источники}
-    \small
-    \begin{itemize}
-        \item Школа анализа данных Яндекса. \textit{Учебник по машинному обучению}.
-        \item Броиловский А. \textit{Обзор задач машинного обучения}. ШАД СПб, 2026.
-        \item Овчаров С. \textit{Линейная регрессия и основы оптимизации}. ШАД СПб, 2026.
-        \item Овчаров С. \textit{Логистическая регрессия и классификация}. ШАД СПб, 2026.
-        \item Zhang A., Lipton Z. C., Li M., Smola A. J.
-        \textit{Dive into Deep Learning: Optimization Algorithms}.
-        \item Материалы проекта \textit{«Математический анализ в методах машинного обучения»}.
-    \end{itemize}
+\mlBody
+\begin{itemize}
+\item Школа анализа данных Яндекса. \textit{Учебник по машинному обучению}.
+\item Броиловский А. \textit{Обзор задач машинного обучения}. ШАД СПб, 2026.
+\item Овчаров С. \textit{Линейная регрессия и основы оптимизации}. ШАД СПб, 2026.
+\item Овчаров С. \textit{Логистическая регрессия и классификация}. ШАД СПб, 2026.
+\item Zhang A., Lipton Z. C., Li M., Smola A. J. \textit{Dive into Deep Learning}. Разделы об оптимизации, MLP, CNN и ResNet.
+\item Материалы проекта \textit{«Математический анализ в методах машинного обучения»} и визуализации участников.
+\end{itemize}
+\end{frame}
 
-    \mlRemark
+\begin{frame}{Материалы проекта на GitHub}
+    \vfill
 
-    В презентации используются собственные вычислительные эксперименты и визуализации,
-    построенные по результатам программной реализации рассматриваемых методов.
+    \begin{center}
+        {\Large \dblue{Исходный код и дополнительные материалы}}
+
+        \vspace{1.1em}
+
+        {\large \url{https://github.com/Z4Y4T/ml_project}}
+    \end{center}
+
+    \vfill
 \end{frame}
 
 \end{document}
