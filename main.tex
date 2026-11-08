@@ -3,6 +3,7 @@
 \usetheme{default}
 \usecolortheme{default}
 
+% pdfLaTeX для обычной сборки; XeLaTeX --- для переносимого просмотра
 \usepackage{iftex}
 \ifPDFTeX
     \usepackage[utf8]{inputenc}
@@ -29,8 +30,14 @@
 \usepackage{array}
 \usepackage{hyperref}
 
+% Рисунки входят в комплект проекта; отсутствующий файл — ошибка,
+% а не повод молча оставить пустое место на слайде.
 \newcommand{\slideimg}[2][]{\includegraphics[#1]{#2}}
 
+
+% ------------------------------------------------------------
+% Цвета и базовый стиль — по MatanPresentation
+% ------------------------------------------------------------
 
 \definecolor{defblue}{RGB}{0,0,150}
 \definecolor{cardblue}{RGB}{216,216,240}
@@ -88,6 +95,10 @@
     \end{tikzpicture}
 }
 
+% ------------------------------------------------------------
+% Служебные обозначения
+% ------------------------------------------------------------
+
 \newcommand{\chapterframe}[2]{%
     \begin{frame}
         \vfill
@@ -110,6 +121,10 @@
 \newcommand{\mlAlgorithm}{\textcolor{defblue}{\bfseries Алгоритм}}
 \newcommand{\mlSubtask}{\textcolor{defblue}{\bfseries Цель}}
 
+% ------------------------------------------------------------
+% Метаданные
+% ------------------------------------------------------------
+
 \title{Математический анализ в методах машинного обучения}
 \author{Вейгандт В., Зайцев Н., Горобец О., Козлов В., Шагеев Э.}
 \date{2026}
@@ -119,6 +134,8 @@
 \begin{frame}
     \titlepage
 \end{frame}
+
+% ============================================================
 
 \chapterframe{1}{Постановка задачи машинного обучения}
 
@@ -386,7 +403,9 @@ $\widehat R_n:\Theta\to\mathbb R$ --- \emph{функция нескольких 
     \end{center}
 \end{frame}
 
+% ============================================================
 
+% Глава 2
 \chapterframe{2}{Линейные модели}
 \begin{frame}{Linear Regression: определение модели}
     \mlBody
@@ -1177,6 +1196,36 @@ Adam не гарантирует превосходства на любой за
 \mlRemark\; Здесь $I(S)$ --- индексы объектов в вершине; по соглашению $0\log 0=0$. В чистой вершине обе меры равны нулю.
 \end{frame}
 
+
+\begin{frame}{Что измеряют Джини и энтропия?}
+\mlBody
+Пусть $p_k$ --- доля объектов класса $k$ в вершине дерева,
+$\sum_{k=1}^K p_k=1$.
+
+\mlDefinition\; \textit{Индекс Джини}
+\[
+ H_{\mathrm{Gini}}=1-\sum_{k=1}^K p_k^2
+\]
+равен вероятности, что два \emph{независимо} выбранных по распределению
+$(p_1,\ldots,p_K)$ класса окажутся различными.
+
+\mlDefinition\; \textit{Энтропия}
+\[
+ H_{\mathrm{ent}}=-\sum_{k=1}^K p_k\log p_k
+\]
+измеряет среднюю неопределённость класса: редкие события несут
+больше информации $-\log p_k$.
+
+\mlExample\; Для двух одинаково представленных классов
+$(p_1,p_2)=(1/2,1/2)$:
+$H_{\mathrm{Gini}}=1/2$, $H_{\mathrm{ent}}=\log2$.
+При $(1,0)$ обе меры равны нулю.
+
+\mlConsequence\; Дерево выбирает split, уменьшающий
+\emph{неоднородность} дочерних вершин; максимум обеих мер
+достигается при равных долях классов.
+\end{frame}
+
 \begin{frame}{Числовой пример критерия Джини}
 \mlBody
 \mlExample\; В корне находятся четыре объекта: два класса $0$ и два класса $1$.
@@ -1232,6 +1281,30 @@ Adam не гарантирует превосходства на любой за
 кусочно-постоянную функцию на областях пространства признаков.
 \end{frame}
 
+
+
+\begin{frame}{Bootstrap: как Random Forest получает разные деревья?}
+\mlBody
+\mlDefinition\; \textit{Bootstrap-выборка} --- новая выборка
+размера $n$, полученная из $n$ исходных объектов случайными
+выборами \emph{с возвращением}.
+
+\mlExample\; Из объектов с номерами $1,2,3,4,5$ можно получить
+индексы $(2,2,3,5,5)$: объекты $2$ и $5$ повторились,
+а $1$ и $4$ не попали в данную выборку.
+
+\mlAlgorithm\; В \textit{Random Forest (случайном лесе)}:
+\begin{enumerate}
+ \item Для каждого дерева независимо создают bootstrap-выборку.
+ \item В каждой вершине случайно выбирают часть признаков и среди
+ них ищут лучшее разбиение.
+ \item Объединяют прогнозы деревьев (среднее или голосование).
+\end{enumerate}
+
+\mlRemark\; Эти две случайности уменьшают сходство деревьев.
+Их усреднение помогает снизить разброс предсказаний,
+но не гарантирует улучшения на любой выборке.
+\end{frame}
 
 \begin{frame}{Random Forest и Gradient Boosting: разная логика}
 \mlBody
@@ -1373,6 +1446,50 @@ Adam не гарантирует превосходства на любой за
 (в нуле обычная производная не существует).
 \end{frame}
 
+% Иллюстрации по материалам chapter5.tex: активации показаны в одном масштабе.
+\begin{frame}{Геометрия функций активации}
+\mlBody
+\mlIdea\; Нелинейность меняет форму зависимости между входом и выходом нейрона; именно поэтому последовательность слоёв уже нельзя заменить одной аффинной функцией.
+\vspace{0.12cm}
+\begin{columns}[T,onlytextwidth]
+    \column{0.49\textwidth}
+    \centering
+    \dblue{Гиперболический тангенс}
+    \[
+        \varphi(z)=\tanh z
+    \]
+    \begin{tikzpicture}[x=0.49cm,y=1.02cm]
+        \draw[gray!35,dashed] (-3.6,1)--(3.6,1);
+        \draw[gray!35,dashed] (-3.6,-1)--(3.6,-1);
+        \draw[->,gray!75] (-3.8,0)--(3.9,0) node[right,black] {$z$};
+        \draw[->,gray!75] (0,-1.35)--(0,1.4) node[above,black] {$a$};
+        \foreach \x in {-3,-1,1,3} {\draw[gray!75] (\x,0.04)--(\x,-0.04);}
+        \foreach \y in {-1,1} {\node[left] at (-0.1,\y) {\scriptsize $\y$};}
+        \draw[defblue,line width=1.25pt,smooth,domain=-3.6:3.6,samples=90]
+          plot (\x,{(exp(2*\x)-1)/(exp(2*\x)+1)});
+    \end{tikzpicture}
+    \par\smallskip
+    Плавная активация, $-1<\tanh z<1$.
+    \column{0.49\textwidth}
+    \centering
+    \dblue{ReLU}
+    \[
+        \varphi(z)=\max(0,z)
+    \]
+    \begin{tikzpicture}[x=0.49cm,y=0.78cm]
+        \draw[->,gray!75] (-3.8,0)--(3.9,0) node[right,black] {$z$};
+        \draw[->,gray!75] (0,-0.45)--(0,3.65) node[above,black] {$a$};
+        \foreach \x in {-3,-1,1,3} {\draw[gray!75] (\x,0.045)--(\x,-0.045);}
+        \draw[defblue,line width=1.25pt] (-3.6,0)--(0,0)--(3.3,3.3);
+        \node[left] at (-0.1,3) {\scriptsize $3$};
+    \end{tikzpicture}
+    \par\smallskip
+    Обнуляет отрицательные входы.
+\end{columns}
+\mlRemark\; Производная ReLU равна нулю при $z<0$ и единице при $z>0$; в точке $z=0$ обычная производная не существует.
+\end{frame}
+
+
 \begin{frame}{Многослойная сеть: последовательность функций}
 \mlBody
 \mlDefinition\; \textit{Multilayer Perceptron} (MLP) --- композиция слоёв, каждый из которых применяет линейное преобразование и нелинейность.
@@ -1395,6 +1512,40 @@ $b^{(\ell)}\in\mathbb R^{d_\ell}$.
 \]
 Выход $f_\theta(x)$ --- результат последнего слоя.
 \end{frame}
+
+% Иллюстрация архитектуры MLP по chapter5.tex; обозначения согласованы с формулами слоя.
+\begin{frame}{Схема MLP: как формулы соответствуют слоям}
+\mlBody
+Пусть два входных признака поступают в скрытый слой из трёх нейронов, а затем --- в один выходной нейрон.
+\vspace{0.1cm}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm,>=stealth,
+    neur/.style={circle,draw=defblue,fill=cardblue,thick,minimum size=0.27cm,inner sep=0pt}]
+    \node[text=defblue,font=\small\bfseries] at (0,2.15) {Вход};
+    \node[text=defblue,font=\small\bfseries] at (3.35,2.15) {Скрытый слой};
+    \node[text=defblue,font=\small\bfseries] at (6.8,2.15) {Выход};
+    \node[neur,label=left:$x_1$] (i1) at (0,0.85) {};
+    \node[neur,label=left:$x_2$] (i2) at (0,-0.85) {};
+    \node[neur] (h1) at (3.35,1.25) {};
+    \node[neur] (h2) at (3.35,0) {};
+    \node[neur] (h3) at (3.35,-1.25) {};
+    \node[neur,label=right:$\hat y$] (o1) at (6.8,0) {};
+    \foreach \i in {1,2} {\foreach \j in {1,2,3} {
+        \draw[->,gray!55,line width=0.6pt] (i\i)--(h\j);
+    }}
+    \foreach \j in {1,2,3} {\draw[->,gray!55,line width=0.6pt] (h\j)--(o1);}
+    \node[below,text=black,font=\scriptsize] at (3.35,-1.58) {$a^{(1)}\in\mathbb R^3$};
+\end{tikzpicture}
+\end{center}
+\mlStatement\; Размерности определяют форму матриц:
+\[
+W^{(1)}\in\mathbb R^{3\times2},\qquad
+W^{(2)}\in\mathbb R^{1\times3},\qquad
+f_\theta(x)=\varphi_2\!\left(W^{(2)}a^{(1)}+b^{(2)}\right).
+\]
+\mlRemark\; Линии --- отдельные обучаемые веса. В скрытом слое вычисляются признаки $a^{(1)}$, которых не было в исходной выборке.
+\end{frame}
+
 
 \begin{frame}{Прямой проход: расчёт двухслойной сети}
 \mlBody
@@ -1421,28 +1572,36 @@ $W^{(2)}\in\mathbb R^{1\times2}$.
 \end{frame}
 
 \begin{frame}{Пример: задача XOR и роль скрытого слоя}
+
 \mlBody
-Пусть $x_1,x_2\in\{0,1\}$. Требуется получить $y=1$, если входы различны, и $y=0$, если совпадают.
-
-\[
- \begin{array}{c|cccc}
- (x_1,x_2)&(0,0)&(0,1)&(1,0)&(1,1)\\\hline
- y&0&1&1&0
- \end{array}
-\]
-\mlStatement\; Эти четыре точки нельзя разделить одной прямой по классам.
-
-\mlExample\; Для ReLU можно взять два скрытых выхода
-\[
- h_1=\operatorname{ReLU}(x_1+x_2),\quad
- h_2=\operatorname{ReLU}(x_1+x_2-1),
-\]
-\[
- \boxed{f(x)=h_1-2h_2}.
-\]
-Проверка: при сумме входов $0,1,2$ результат соответственно $0,1,0$.
-
-\mlConsequence\; Даже небольшая нелинейная сеть может решить задачу, недоступную одной линейной границе.
+\mlTask\; Для $x_1,x_2\in\{0,1\}$ предсказать $1$, если входы различаются, и $0$ иначе (XOR).
+\begin{columns}[c,onlytextwidth]
+    \column{0.41\textwidth}
+    \centering
+    \begin{tikzpicture}[x=2.35cm,y=2.35cm]
+        \draw[->,gray!75] (-0.18,0)--(1.36,0) node[right,black] {$x_1$};
+        \draw[->,gray!75] (0,-0.18)--(0,1.36) node[above,black] {$x_2$};
+        \foreach \x/\y in {0/0,1/1} {\draw[defblue,line width=1.25pt,fill=white] (\x,\y) circle (3.8pt);}
+        \foreach \x/\y in {0/1,1/0} {\fill[defblue] (\x,\y) circle (3.8pt);}
+        \node[below left] at (0,0) {\scriptsize $0$};
+        \node[below] at (1,0) {\scriptsize $1$};
+        \node[left] at (0,1) {\scriptsize $1$};
+    \end{tikzpicture}
+    \par\smallskip
+    {\small \textcolor{defblue}{$\bullet$} --- класс $1$; $\circ$ --- класс $0$.}
+    \column{0.57\textwidth}
+    \mlStatement\; Одна прямая не может отделить закрашенные точки от незакрашенных: классы линейно неразделимы.
+    \vspace{0.18cm}
+    \mlExample\; Построим сеть с двумя скрытыми ReLU-нейронами:
+    \[
+      \begin{aligned}
+       h_1&=\operatorname{ReLU}(x_1+x_2),\\
+       h_2&=\operatorname{ReLU}(x_1+x_2-1),\\
+       f(x)&=h_1-2h_2.
+      \end{aligned}
+    \]
+\end{columns}
+\mlConsequence\; При $x_1+x_2=0,1,2$ функция выдаёт соответственно $0,1,0$. Нелинейный скрытый слой решает задачу, недоступную одной линейной границе.
 \end{frame}
 
 \begin{frame}{Пример архитектуры: распознавание цифр}
@@ -1463,25 +1622,59 @@ $W^{(2)}\in\mathbb R^{1\times2}$.
 \mlRemark\; Это лишь пример архитектуры из исходного материала по нейросетям, а не требование для распознавания цифр. Большая сеть не гарантирует лучшего качества.
 \end{frame}
 
+
+\begin{frame}{Scores и Softmax: как сеть выдаёт вероятности?}
+\mlBody
+\mlDefinition\; \textit{Score} (также \textit{logit}) $z_k\in\mathbb R$
+--- вещественная оценка класса $k$ \emph{до} перевода в вероятность.
+Она может быть отрицательной и не обязана лежать между $0$ и $1$.
+
+\mlDefinition\; \textit{Softmax} преобразует вектор
+$z=(z_1,\ldots,z_K)^T$ в распределение по $K$ классам:
+\[
+ \boxed{p_k=\frac{e^{z_k}}{\sum_{j=1}^{K}e^{z_j}}},\qquad
+ 0<p_k<1,\quad\sum_{k=1}^{K}p_k=1.
+\]
+
+\mlExample\; Если $z=(0,\log 2,\log 3)^T$, то
+\[
+ (e^{z_1},e^{z_2},e^{z_3})=(1,2,3),\qquad
+ p=\left(\tfrac16,\tfrac26,\tfrac36\right)^T.
+\]
+
+\mlRemark\; Чем больше score класса относительно остальных,
+тем больше его вероятность. Прибавление одной константы
+ко всем $z_k$ не изменяет результат Softmax.
+\end{frame}
+
 \begin{frame}{Выход сети и функция потерь}
 \mlBody
-Тип выходного слоя выбирают в соответствии с задачей.
-\begin{itemize}
-\item \textit{Регрессия:} одно число $\hat y=f_\theta(x)$; можно использовать MSE из главы 2.
-\item \textit{Бинарная классификация:} вероятность $p=\sigma(z)$ и BCE.
-\item \textit{Многоклассовая классификация:} $K$ оценок $z_1,\ldots,z_K$ переводятся в вероятности функцией softmax.
-\end{itemize}
-\mlDefinition\; Для $k=1,\ldots,K$:
+Разные задачи требуют разных интерпретаций выхода сети
+и разных функций потерь.
+
+\mlDefinition\; \textit{Регрессия:} прогноз --- число
+$\hat y=f_\theta(x)\in\mathbb R$. Например,
 \[
- \boxed{p_k=\frac{e^{z_k}}{\sum_{j=1}^{K}e^{z_j}}},
- \qquad \sum_{k=1}^Kp_k=1.
+ \boxed{\ell_{\mathrm{MSE}}(y,\hat y)=(y-\hat y)^2}.
 \]
-Для правильного класса $y\in\{1,\ldots,K\}$ кросс-энтропийная потеря равна
+
+\mlDefinition\; \textit{Бинарная классификация:}
+$p=\sigma(z)$ --- вероятность класса $1$,
+$y\in\{0,1\}$. Используется
 \[
- \ell(y,p)=-\log p_y
- =-z_y+\log\Bigl(\sum_{j=1}^{K}e^{z_j}\Bigr).
+ \boxed{\ell_{\mathrm{BCE}}(y,p)=
+ -y\log p-(1-y)\log(1-p)}.
 \]
-\mlRemark\; Вновь сохраняется схема: предсказание $\to$ потеря $\to$ минимизация эмпирического риска.
+
+\mlDefinition\; \textit{Многоклассовая классификация:}
+$p=\operatorname{softmax}(z)$ --- распределение по $K$ классам.
+При правильном классе $y\in\{1,\ldots,K\}$:
+\[
+ \boxed{\ell_{\mathrm{CE}}(y,p)=-\log p_y}.
+\]
+
+\mlRemark\; Общий принцип из главы 1 сохраняется:
+прогноз $\to$ потеря $\to$ минимизация эмпирического риска.
 \end{frame}
 
 \begin{frame}{Softmax и Cross-Entropy: производная по score}
@@ -1606,11 +1799,67 @@ $g_t\ne\nabla L(\theta_t)$ для полной выборки.
 backpropagation вычислительно эффективным.
 \end{frame}
 
+
+\begin{frame}{Что в Backpropagation идёт «назад»?}
+\mlBody
+\mlIdea\; На прямом проходе сеть вычисляет выходы
+слоёв $a^{(1)},\ldots,a^{(L)}$ и потерю $\ell$.
+На обратном проходе выясняет, \emph{какие промежуточные значения
+сильнее влияют на эту потерю}.
+
+\mlDefinition\; \textit{Сигнал ошибки слоя} --- вектор
+чувствительностей
+\[
+ \boxed{\delta^{(\ell)}=\nabla_{z^{(\ell)}}\ell},\qquad
+ \delta_j^{(\ell)}=\frac{\partial\ell}{\partial z_j^{(\ell)}}.
+\]
+
+\mlStatement\; Для малого изменения выхода линейной части слоя
+\[
+ \Delta\ell\approx
+ \bigl\langle\delta^{(\ell)},\Delta z^{(\ell)}\bigr\rangle.
+\]
+Положительная компонента $\delta_j^{(\ell)}$ означает, что
+увеличение $z_j^{(\ell)}$ локально повышает потерю;
+отрицательная --- понижает.
+
+\mlRemark\; $\delta^{(\ell)}$ --- \emph{не} разность
+«ответ минус прогноз», а производная потери по сигналам слоя.
+Поэтому её можно вычислять последовательно от выхода ко входу.
+\end{frame}
+
+\begin{frame}{Матрица Якоби: правило цепочки для векторов}
+\mlBody
+\mlDefinition\; Для дифференцируемого отображения
+$F:\mathbb R^d\to\mathbb R^m$ \textit{матрица Якоби}
+содержит все частные производные его компонент:
+\[
+ \boxed{J_F(x)=\left(\frac{\partial F_i}{\partial x_j}\right)_
+ {\substack{1\le i\le m\\1\le j\le d}}\in\mathbb R^{m\times d}}.
+\]
+
+\mlExample\; Если $F(x_1,x_2)=(x_1+x_2,x_1x_2)^T$, то
+\[
+ J_F(x)=\begin{pmatrix}1&1\\x_2&x_1\end{pmatrix}.
+\]
+
+\mlStatement\; Для скалярной функции $g:\mathbb R^m\to\mathbb R$
+многомерное правило цепочки имеет вид
+\[
+ \boxed{\nabla_x(g\circ F)(x)
+ =J_F(x)^T\nabla g\bigl(F(x)\bigr)}.
+\]
+
+\mlConsequence\; На обратном проходе производные
+умножаются на транспонированный Якобиан очередного слоя.
+Отсюда и возникает рекуррентная формула Backpropagation.
+\end{frame}
+
 \begin{frame}{Backpropagation: производные целого слоя}
 \mlBody
-Для многослойной сети введём \textit{ошибку слоя}
-$\delta^{(\ell)}=\partial\ell/\partial z^{(\ell)}$.
-Пусть $\odot$ обозначает покоординатное произведение.
+Используем введённый сигнал ошибки слоя
+$\delta^{(\ell)}=\nabla_{z^{(\ell)}}\ell$.
+Символ $\odot$ обозначает покоординатное произведение векторов.
 
 \mlStatement\; Если активации применяются покоординатно, то правило цепочки даёт
 \[
@@ -1645,44 +1894,94 @@ $\delta^{(\ell)}=\partial\ell/\partial z^{(\ell)}$.
 Например, $0.5^{10}\approx0.001$ --- за десять слоёв масштаб градиента
 уменьшился почти в тысячу раз.
 
-\mlRemark\; Для векторных слоёв используются \emph{матрицы Якоби}
-(таблицы всех частных производных одного слоя по входам).
+\mlRemark\; Для векторных слоёв вместо произведения чисел
+возникают произведения матриц Якоби, определённых ранее.
 Не всякая глубокая сеть страдает от затухания градиента.
 \end{frame}
 
 \begin{frame}{ResNet: остаточные связи и путь для градиента}
+
 \mlBody
 \mlDefinition\; \textit{Остаточный блок} (residual block) вычисляет
 \[
  \boxed{h_{\ell+1}=h_\ell+F_\ell(h_\ell)},
 \]
-где $F_\ell$ --- несколько обучаемых преобразований.
-
-В скалярном случае производная по входу блока:
+где $F_\ell$ --- несколько обучаемых преобразований, а сложение требует согласованных размерностей.
+\begin{center}
+\begin{tikzpicture}[>=stealth,font=\small]
+    \node (x) at (0,0) {$h_\ell$};
+    \node[draw=defblue,thick,rounded corners=2pt,minimum width=2.45cm,minimum height=0.66cm] (f) at (3,0) {$F_\ell$ (несколько слоёв)};
+    \node[draw=defblue,circle,inner sep=2pt] (sum) at (6.4,0) {$+$};
+    \node (out) at (8.25,0) {$h_{\ell+1}$};
+    \draw[->,gray!80] (x)--(f);
+    \draw[->,gray!80] (f)--node[above,black] {$F_\ell(h_\ell)$}(sum);
+    \draw[->,gray!80] (sum)--(out);
+    \draw[->,defblue,thick] (x.north)--(0,1.0)--node[above,black] {обходная связь}(6.4,1.0)--(sum.north);
+\end{tikzpicture}
+\end{center}
+\mlStatement\; В скалярном случае $dh_{\ell+1}/dh_\ell=1+F_\ell'(h_\ell)$;
+для векторного входа якобиан блока равен
 \[
- \frac{dh_{\ell+1}}{dh_\ell}=1+F_\ell'(h_\ell).
+ \boxed{J(h_\ell)=I+J_{F_\ell}(h_\ell)}.
 \]
-Слагаемое $1$ соответствует обходному (shortcut) пути; оно помогает передавать информацию и градиент через блок.
-
-\mlRemark\; Идея ResNet помогает обучать глубокие сети, но сама по себе не гарантирует отсутствие любых проблем оптимизации.
+\mlRemark\; Добавка $I$ создаёт прямой путь для передачи производных через блок и часто облегчает обучение глубоких сетей. Она не гарантирует полного отсутствия затухания градиентов.
 \end{frame}
 
 \begin{frame}{CNN: локальные фильтры и общие веса}
+
 \mlBody
-\mlDefinition\; \textit{Convolutional Neural Network} (свёрточная сеть, CNN) использует одни и те же обучаемые фильтры для обработки локальных участков входа.
-
-Для входной матрицы пикселей $A$ и фильтра $K\in\mathbb R^{r\times r}$ одно выходное значение (без смещения) имеет вид
+\mlDefinition\; \textit{Convolutional Neural Network} (CNN, свёрточная сеть) обрабатывает локальные участки изображения обучаемыми фильтрами.
+\begin{columns}[c,onlytextwidth]
+    \column{0.41\textwidth}
+    \centering
+    \begin{tikzpicture}[x=0.40cm,y=0.40cm]
+        \fill[blue!7] (0,0) rectangle (7,7);
+        \foreach \x/\y in {2/5,3/5,4/5,4/4,3/3,2/2,2/1,3/1,4/1}
+            {\fill[defblue!60] (\x,\y) rectangle +(1,1);}
+        \draw[step=1,gray!55,line width=0.35pt] (0,0) grid (7,7);
+        \draw[defblue,line width=1.5pt] (1,3) rectangle (4,6);
+    \end{tikzpicture}
+    \par\smallskip
+    {\small Выделен участок $3\times3$.}
+    \column{0.57\textwidth}
+    \mlIdea\; Один фильтр последовательно перемещается по изображению и применяет \emph{те же самые веса} к разным участкам.
+    \vspace{0.18cm}
+    Это позволяет выделять локальные детали: штрихи, границы и более сложные сочетания.
+\end{columns}
+\vspace{0.12cm}
+\mlStatement\; Для матрицы пикселей $A$ и фильтра $K\in\mathbb R^{r\times r}$ отклик в позиции $(u,v)$ равен
 \[
- \boxed{B_{u,v}=\sum_{i=0}^{r-1}\sum_{j=0}^{r-1}K_{ij}A_{u+i,v+j}}.
+ \boxed{B_{u,v}=\sum_{i=0}^{r-1}\sum_{j=0}^{r-1} K_{ij}A_{u+i,v+j}}.
 \]
-\mlRemark\; В ML такая операция обычно реализуется как
-\emph{кросс-корреляция} (без переворота ядра), хотя слой называют свёрточным.
-Для входа $H\times W$ без дополнения и при шаге $1$
-выход имеет размер $(H-r+1)\times(W-r+1)$;
-один фильтр использует всего $r^2$ общих весов.
-
-\mlExample\; Фильтр $K=\begin{psmallmatrix}1&0&-1\\1&0&-1\\1&0&-1\end{psmallmatrix}$ выявляет различие между левой и правой частями участка изображения.
+\mlRemark\; В ML это обычно кросс-корреляция (без переворота ядра). При шаге $1$ и отсутствии дополнения выход имеет размер $(H-r+1)\times(W-r+1)$.
 \end{frame}
+
+% Числовая иллюстрация свёрточного фильтра по chapter5.tex.
+\begin{frame}{CNN: как фильтр обнаруживает границу}
+\mlBody
+\mlExample\; Возьмём фрагмент изображения размером $3\times3$ и фильтр, сравнивающий левый и правый столбцы:
+\begin{columns}[T,onlytextwidth]
+    \column{0.49\textwidth}
+    \centering
+    \dblue{Участок изображения}
+    \[
+    A=\begin{pmatrix}1&1&0\\1&1&0\\1&1&0\end{pmatrix}
+    \]
+    \column{0.49\textwidth}
+    \centering
+    \dblue{Веса фильтра}
+    \[
+    K=\begin{pmatrix}1&0&-1\\1&0&-1\\1&0&-1\end{pmatrix}
+    \]
+\end{columns}
+\mlAlgorithm\; Перемножим соответствующие элементы и сложим:
+\[
+ s=\sum_{i=1}^{3}\sum_{j=1}^{3}A_{ij}K_{ij}=1+1+1=3.
+\]
+\mlConsequence\; Если бы весь участок имел одинаковую яркость $c$, получилось бы $s=c\sum_{i,j}K_{ij}=0$. Ненулевой отклик отражает перепад яркости между его краями.
+\mlRemark\; Перемещая этот фильтр по изображению, получаем \emph{карту признака}. В примере веса заданы вручную; в обучаемой CNN они подбираются по данным.
+\end{frame}
+
 
 \begin{frame}{CNN: почему общие веса экономят параметры?}
 \mlBody
@@ -1751,9 +2050,36 @@ $8$ карт размером $26\times26$, то есть $5408$ выходны�
 % Глава 6 --- короткая заключительная мини-глава
 \chapterframe{6}{Муравьиный алгоритм}
 
+
+\begin{frame}{Задача коммивояжёра: точная постановка}
+\mlBody
+\mlTask\; Для $N$ городов найти \emph{кратчайший замкнутый маршрут},
+который посещает каждый город ровно один раз до возвращения
+в исходный город.
+
+\mlDefinition\; Рассмотрим полный неориентированный взвешенный граф
+$G=(V,E)$, где $V=\{1,\ldots,N\}$ --- города,
+$d_{ij}=d_{ji}>0$ --- длина ребра между разными городами.
+
+\mlDefinition\; Маршрут задаётся перестановкой
+$\pi=(\pi_1,\ldots,\pi_N)$ вершин. Его длина:
+\[
+ \boxed{C(\pi)=\sum_{k=1}^{N-1}d_{\pi_k,\pi_{k+1}}
+             +d_{\pi_N,\pi_1}}.
+\]
+Последнее слагаемое --- возвращение в начальный город.
+
+\mlTask\; Найти $\pi^*\in\operatorname*{arg\,min}_{\pi}C(\pi)$.
+
+\mlRemark\; Искомая переменная --- перестановка, а не вектор
+вещественных параметров. Поэтому обычный градиентный спуск
+по $\pi$ здесь неприменим; ACO ищет хороший маршрут вероятностно.
+\end{frame}
+
 \begin{frame}{Ant Colony Optimization: вероятностный выбор маршрута}
 \mlBody
-\mlTask\; На взвешенном графе найти короткий маршрут, проходящий через все требуемые вершины (например, задача коммивояжёра).
+\mlTask\; Для задачи коммивояжёра найти допустимый тур $\pi$
+с малой длиной $C(\pi)$, не перебирая все перестановки вершин.
 
 \mlDefinition\; \textit{Ant Colony Optimization} (муравьиный алгоритм)
 --- \emph{стохастическая метаэвристика}: алгоритм случайного поиска,
@@ -1762,7 +2088,7 @@ $8$ карт размером $26\times26$, то есть $5408$ выходны�
 привлекательности $\nu_{ij}>0$.
 \[
  \boxed{P_{ij}=\frac{\tau_{ij}^{\alpha}\nu_{ij}^{\beta}}{\sum_{k\in A_i}\tau_{ik}^{\alpha}\nu_{ik}^{\beta}}},
- \qquad A_i\text{ --- допустимые следующие вершины}.
+ \qquad A_i\text{ --- ещё не посещённые города}.
 \]
 \mlExample\; Для расстояний $d_{ij}>0$ берут $\nu_{ij}=1/d_{ij}$.
 Если два ребра имеют $\tau_1=2$, $\tau_2=1$,
@@ -1800,8 +2126,8 @@ $\pi_k$ длины $L_k$:
 \mlAlgorithm
 \begin{enumerate}
  \item Задать начальные значения $\tau_{ij}>0$ на доступных рёбрах.
- \item Каждый «муравей» строит полный допустимый маршрут:
- выбирать следующее ребро случайно, с вероятностью $P_{ij}$.
+ \item Каждый «муравей» посещает все города без повторений,
+ выбирая очередной по $P_{ij}$, и возвращается в стартовый город.
  \item Посчитать длину $L_k$ маршрута каждого муравья.
  \item Испарить часть феромона и подкрепить рёбра найденных путей:
  $\tau_{ij}\gets(1-\rho_{\mathrm{evap}})\tau_{ij}+\Delta\tau_{ij}$.
