@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1794141298.47313 "/Users/z4y4ts/dev/calculus/projects/ml/main.tex" "out/main.pdf" "main" 1794141302.7103 0
+["pdflatex"] 1794176816.83888 "/Users/z4y4ts/dev/calculus/projects/ml/main.tex" "out/main.pdf" "main" 1794176819.07409 0
   "/Users/z4y4ts/Library/texlive/2026/texmf-var/fonts/tfm/lh/lh-t2a/larm0500.tfm" 1793104984.98185 3252 bc0f8cc163ba94bbce20e59f671a255d ""
   "/Users/z4y4ts/Library/texlive/2026/texmf-var/fonts/tfm/lh/lh-t2a/lasi0900.tfm" 1793104989.78084 3532 861c86aefe36d5783fe3fe3cf9fc08ed ""
   "/Users/z4y4ts/Library/texlive/2026/texmf-var/fonts/tfm/lh/lh-t2a/lasi1000.tfm" 1793104980.21784 3508 f18f005668432755c60786cecb7d9989 ""
@@ -18,7 +18,7 @@
   "/Users/z4y4ts/Library/texlive/2026/texmf-var/fonts/tfm/lh/lh-t2a/lasx0900.tfm" 1794135826.43183 3296 03818de6a0c280957fca2395a523c240 ""
   "/Users/z4y4ts/Library/texlive/2026/texmf-var/fonts/tfm/lh/lh-t2a/lasx1200.tfm" 1794135836.31862 3332 0e7d27348ca78eec5601dd465f0356d2 ""
   "/Users/z4y4ts/Library/texlive/2026/texmf-var/fonts/tfm/lh/lh-t2a/latt1200.tfm" 1793006063.29611 1272 bf3bb5cc29880b269c8bcb412a1ac6e2 ""
-  "/Users/z4y4ts/dev/calculus/projects/ml/main.tex" 1794141293.4091 104842 33e2852eb6612a54830bf8e69778604c ""
+  "/Users/z4y4ts/dev/calculus/projects/ml/main.tex" 1794176814.20494 109194 6c21d0e50b79301303dbc69e4b7af935 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t2a.enc" 1136849721 3141 82d5616418ed8d5de703b3951bedecb4 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/lh/lh-t2a/larm0600.tfm" 1771174259 3248 7c0b9d76a2cd84ed06764a4c6eea5de4 ""
@@ -296,16 +296,15 @@
   "img/mse_surface.pdf" 1793537118 124761 6bdc9194729789d8e9d18a7f66820adc ""
   "img/optimizer_loss.pdf" 1793537118 58968 7475462dec06a02275b18ac27771b70d ""
   "img/optimizer_trajectories.pdf" 1793537118 58952 3ea0154164e7b44e7458be3fe3c0b972 ""
-  "img/rf_vs_boosting.pdf" 1793537118 81868 b88080c6ed5393e735f4dc10c09cab67 ""
   "img/sigmoid.pdf" 1793364570 16924 3fbdf0660516d0e80ddf1ad46586efb0 ""
   "img/supervised_learning_scheme.pdf" 1793537118 45048 92dbd13c3a0d8474e3a212fa4c7db80f ""
   "img/train_val_test.pdf" 1793537118 31225 52f0ca9ce9873ae658cb69aa394df739 ""
   "img/tree_candidates.pdf" 1793364572 19275 df744c98d4b955446ee1a17b2230fb84 ""
   "img/tree_split.pdf" 1793364572 19289 b97e5d284a18ca3c111bf899cfcda5af ""
-  "main.tex" 1794141293.4091 104842 33e2852eb6612a54830bf8e69778604c ""
-  "out/main.aux" 1794141302.45616 17093 57446f4dcea086c6bd5421c5a2719891 "pdflatex"
-  "out/main.nav" 1794141302.45948 9014 342e878eb8aabf0b1e26a5b8e6fe62cb "pdflatex"
-  "out/main.out" 1794141299.37589 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "main.tex" 1794176814.20494 109194 6c21d0e50b79301303dbc69e4b7af935 ""
+  "out/main.aux" 1794176818.94252 17445 047d7da423f90b3459af630f3a00e494 "pdflatex"
+  "out/main.nav" 1794176818.94441 9200 f0612b274cef7ec73a65180e11dfd18e "pdflatex"
+  "out/main.out" 1794176817.26846 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
   (generated)
   "out/main.aux"
   "out/main.log"

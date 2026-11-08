@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.10.24)  8 NOV 2026 15:34
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.10.24)  9 NOV 2026 01:26
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1227,59 +1227,58 @@ Package pdftex.def Info: img/tree_split.pdf  used on input line 1157.
 
 ] [51
 
+] [52
+
+] [53
+
 ]
-<img/tree_candidates.pdf, id=929, 593.81805pt x 463.73201pt>
+<img/tree_candidates.pdf, id=940, 593.81805pt x 463.73201pt>
 File: img/tree_candidates.pdf Graphic file (type pdf)
 <use img/tree_candidates.pdf>
-Package pdftex.def Info: img/tree_candidates.pdf  used on input line 1256.
+Package pdftex.def Info: img/tree_candidates.pdf  used on input line 1317.
 (pdftex.def)             Requested size: 174.88486pt x 136.57332pt.
- [52
-
- <./img/tree_candidates.pdf>] [53
-
-]
-<img/decision_tree.pdf, id=987, 379.50484pt x 213.69136pt>
-File: img/decision_tree.pdf Graphic file (type pdf)
-<use img/decision_tree.pdf>
-Package pdftex.def Info: img/decision_tree.pdf  used on input line 1282.
-(pdftex.def)             Requested size: 235.97966pt x 132.87527pt.
  [54
 
- <./img/decision_tree.pdf>] [55
+ <./img/tree_candidates.pdf>] [55
 
 ]
-<img/rf_vs_boosting.pdf, id=1036, 564.44775pt x 117.38354pt>
-File: img/rf_vs_boosting.pdf Graphic file (type pdf)
-<use img/rf_vs_boosting.pdf>
-Package pdftex.def Info: img/rf_vs_boosting.pdf  used on input line 1324.
-(pdftex.def)             Requested size: 290.05219pt x 60.31975pt.
+<img/decision_tree.pdf, id=998, 379.50484pt x 213.69136pt>
+File: img/decision_tree.pdf Graphic file (type pdf)
+<use img/decision_tree.pdf>
+Package pdftex.def Info: img/decision_tree.pdf  used on input line 1343.
+(pdftex.def)             Requested size: 235.97966pt x 132.87527pt.
  [56
 
- <./img/rf_vs_boosting.pdf>] [57
-
-] [58
+ <./img/decision_tree.pdf>] [57
 
 ]
-<img/boosting_steps.pdf, id=1095, 890.125pt x 622.72603pt>
+Overfull \hbox (16.60384pt too wide) detected at line 1424
+[]\OT1/mathkerncmss/m/sl/10 F\OT1/cmss/m/n/10 (\OT1/mathkerncmss/m/sl/10 x\OT1/cmss/m/n/10 ) = [] [] \OT1/mathkerncmss/m/sl/10 h[]\OT1/cmss/m/n/10 (\OT1/mathkerncmss/m/sl/10 x\OT1/cmss/m/n/10 )\OML/cmm/m/it/10 ;  []\OT1/mathkerncmss/m/sl/10 F[] \OT1/cmss/m/n/10 = \OT1/mathkerncmss/m/sl/10 F[] \OT1/cmss/m/n/10 + \OML/cmm/m/it/10 ^^Q\OT1/mathkerncmss/m/sl/10 h[]\OML/cmm/m/it/10 :
+ []
+
+[58
+
+] [59
+
+] [60
+
+]
+<img/boosting_steps.pdf, id=1062, 890.125pt x 622.72603pt>
 File: img/boosting_steps.pdf Graphic file (type pdf)
 <use img/boosting_steps.pdf>
-Package pdftex.def Info: img/boosting_steps.pdf  used on input line 1379.
+Package pdftex.def Info: img/boosting_steps.pdf  used on input line 1476.
 (pdftex.def)             Requested size: 183.00652pt x 128.03024pt.
- [59
+ [61
 
  <./img/boosting_steps.pdf>]
-<img/boosting_loss.pdf, id=1160, 601.045pt x 405.916pt>
+<img/boosting_loss.pdf, id=1127, 601.045pt x 405.916pt>
 File: img/boosting_loss.pdf Graphic file (type pdf)
 <use img/boosting_loss.pdf>
-Package pdftex.def Info: img/boosting_loss.pdf  used on input line 1394.
+Package pdftex.def Info: img/boosting_loss.pdf  used on input line 1491.
 (pdftex.def)             Requested size: 180.31488pt x 121.77573pt.
- [60
+ [62
 
- <./img/boosting_loss.pdf>] [61
-
-] [62
-
-] [63
+ <./img/boosting_loss.pdf>] [63
 
 ] [64
 
@@ -1337,28 +1336,32 @@ Package pdftex.def Info: img/boosting_loss.pdf  used on input line 1394.
 
 ] [91
 
+] [92
+
+] [93
+
 ]
-<img/ant_colony_early.pdf, id=1388, 466.7435pt x 413.14302pt>
+<img/ant_colony_early.pdf, id=1355, 466.7435pt x 413.14302pt>
 File: img/ant_colony_early.pdf Graphic file (type pdf)
 <use img/ant_colony_early.pdf>
-Package pdftex.def Info: img/ant_colony_early.pdf  used on input line 2162.
+Package pdftex.def Info: img/ant_colony_early.pdf  used on input line 2259.
 (pdftex.def)             Requested size: 134.3622pt x 118.93213pt.
-<img/ant_colony_late.pdf, id=1389, 466.7435pt x 413.14302pt>
+<img/ant_colony_late.pdf, id=1356, 466.7435pt x 413.14302pt>
 File: img/ant_colony_late.pdf Graphic file (type pdf)
 <use img/ant_colony_late.pdf>
-Package pdftex.def Info: img/ant_colony_late.pdf  used on input line 2162.
+Package pdftex.def Info: img/ant_colony_late.pdf  used on input line 2259.
 (pdftex.def)             Requested size: 134.3622pt x 118.93213pt.
- [92
+ [94
 
- <./img/ant_colony_early.pdf> <./img/ant_colony_late.pdf>] [93
+ <./img/ant_colony_early.pdf> <./img/ant_colony_late.pdf>] [95
 
-] [94
+] [96
 
 ]
-LaTeX Font Info:    Trying to load font information for T2A+cmtt on input line 2204.
+LaTeX Font Info:    Trying to load font information for T2A+cmtt on input line 2301.
  (/usr/local/texlive/2026/texmf-dist/tex/latex/cyrillic/t2acmtt.fd
 File: t2acmtt.fd 2001/08/11 v1.0a Computer Modern Cyrillic font definitions
-) [95
+) [97
 
 ]
 \tf@nav=\write6
@@ -1379,18 +1382,18 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 28487 strings out of 467525
- 554317 string characters out of 5418981
- 949252 words of memory out of 5000000
- 56646 multiletter control sequences out of 15000+600000
+ 28550 strings out of 467525
+ 555071 string characters out of 5418981
+ 954809 words of memory out of 5000000
+ 56705 multiletter control sequences out of 15000+600000
  660934 words of font info for 109 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 128i,16n,123p,418b,969s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 128i,16n,123p,418b,1066s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex9.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi12.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi8.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi9.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm7.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm0600.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm0700.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfsi0900.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfsi1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfss0500.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfss0600.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfss0700.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfss0800.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfss0900.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfss1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfss1200.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfss1440.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfss1728.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfsx0500.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfsx0900.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfsx1000.pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sftt1200.pfb>
-Output written on out/main.pdf (95 pages, 1481069 bytes).
+Output written on out/main.pdf (97 pages, 1425839 bytes).
 PDF statistics:
- 1708 PDF objects out of 1728 (max. 8388607)
- 864 compressed objects within 9 object streams
- 191 named destinations out of 1000 (max. 500000)
- 143 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1677 PDF objects out of 1728 (max. 8388607)
+ 848 compressed objects within 9 object streams
+ 195 named destinations out of 1000 (max. 500000)
+ 138 words of extra memory for PDF output out of 10000 (max. 10000000)
 
